@@ -4,322 +4,439 @@
   <base target="_top">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Painel Admin — Agendamentos</title>
+  <title>Painel Admin - Agendamentos</title>
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/lucide@latest"></script>
   <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-    :root { 
-      --brand     : #1B5E91;
-      --brand-lt  : #2980B9;
-      --brand-bg  : #EBF4FB;
-      --success   : #1A7A4A;
-      --success-bg: #D4EDDA;
-      --danger    : #922B21;
-      --danger-bg : #FADBD8;
-      --warn      : #B7770D;
-      --warn-bg   : #FEF3CD;
-      --gray-50   : #F8FAFC;
-      --gray-100  : #F1F5F9;
-      --gray-200  : #E2E8F0;
-      --gray-400  : #94A3B8;
-      --gray-600  : #475569;
-      --gray-800  : #1E293B;
-      --shadow    : 0 2px 12px rgba(0,0,0,.08);
+    :root {
+      --brand: #1769aa;
+      --brand-dark: #0f416f;
+      --brand-soft: #e8f3fb;
+      --accent: #00a39b;
+      --success: #16824a;
+      --success-soft: #e8f7ef;
+      --danger: #b42318;
+      --danger-soft: #fff0ee;
+      --warning: #b7791f;
+      --warning-soft: #fff7e6;
+      --ink: #172033;
+      --muted: #64748b;
+      --line: #dbe4ee;
+      --surface: #ffffff;
+      --canvas: #f6f8fb;
+      --radius: 8px;
+      --shadow: 0 16px 40px rgba(15, 35, 60, .1);
+      --shadow-sm: 0 8px 22px rgba(15, 35, 60, .08);
     }
 
     body {
       font-family: 'Inter', sans-serif;
-      background: var(--gray-100);
       min-height: 100vh;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at top right, rgba(0, 163, 155, .12), transparent 28%),
+        linear-gradient(180deg, #eef5fb 0%, var(--canvas) 36%, #fff 100%);
     }
 
-    /* ── Header ── */
+    [x-cloak] { display: none !important; }
+
     header {
-      background: var(--brand);
-      color: #fff;
-      padding: 0 24px;
-      height: 56px;
+      min-height: 68px;
+      padding: 12px clamp(16px, 3vw, 32px);
       display: flex;
       align-items: center;
       justify-content: space-between;
-      box-shadow: 0 2px 8px rgba(0,0,0,.2);
+      gap: 16px;
+      border-bottom: 1px solid rgba(219, 228, 238, .86);
+      background: rgba(255, 255, 255, .86);
+      backdrop-filter: blur(14px);
       position: sticky;
       top: 0;
-      z-index: 100;
+      z-index: 50;
     }
-    .header-left { display: flex; align-items: center; gap: 10px; }
+
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 0;
+    }
+
+    .header-icon, .stat-icon, .empty-icon {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
     .header-icon {
-      width: 32px; height: 32px;
-      background: rgba(255,255,255,.2);
-      border-radius: 7px;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 16px;
-    }
-    header h1 { font-size: 1rem; font-weight: 700; }
-    .header-badge {
-      background: rgba(255,255,255,.2);
-      border-radius: 20px;
-      padding: 3px 10px;
-      font-size: .75rem;
-      font-weight: 600;
-    }
-    .btn-sair {
-      background: rgba(255,255,255,.15);
-      border: 1px solid rgba(255,255,255,.3);
+      width: 42px;
+      height: 42px;
+      border-radius: var(--radius);
       color: #fff;
-      border-radius: 6px;
-      padding: 6px 14px;
-      font-family: 'Inter', sans-serif;
-      font-size: .82rem;
-      font-weight: 600;
-      cursor: pointer;
-      transition: background .2s;
+      background: linear-gradient(135deg, var(--brand), var(--accent));
+      box-shadow: var(--shadow-sm);
     }
-    .btn-sair:hover { background: rgba(255,255,255,.25); }
 
-    /* ── Layout ── */
-    main { padding: 24px; max-width: 1400px; margin: 0 auto; }
+    header h1 { font-size: 1.05rem; font-weight: 800; letter-spacing: 0; }
+    .header-sub { color: var(--muted); font-size: .8rem; margin-top: 2px; }
 
-    /* ── Cards de estatísticas ── */
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-shrink: 0;
+    }
+
+    .header-badge {
+      min-height: 34px;
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 0 12px;
+      border-radius: var(--radius);
+      color: var(--brand-dark);
+      background: var(--brand-soft);
+      border: 1px solid #cfe6f7;
+      font-size: .8rem;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+
+    main {
+      width: min(1440px, 100%);
+      margin: 0 auto;
+      padding: clamp(18px, 3vw, 30px);
+    }
+
     .stats-grid {
       display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 16px;
-      margin-bottom: 24px;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 14px;
+      margin-bottom: 18px;
     }
+
     .stat-card {
-      background: #fff;
-      border-radius: 10px;
-      padding: 18px 20px;
-      box-shadow: var(--shadow);
+      min-height: 100px;
+      background: rgba(255, 255, 255, .94);
+      border: 1px solid rgba(219, 228, 238, .95);
+      border-radius: var(--radius);
+      padding: 18px;
+      box-shadow: var(--shadow-sm);
       display: flex;
       align-items: center;
       gap: 14px;
     }
-    .stat-icon {
-      width: 44px; height: 44px;
-      border-radius: 10px;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 20px;
-      flex-shrink: 0;
-    }
-    .stat-icon.blue   { background: var(--brand-bg); }
-    .stat-icon.green  { background: var(--success-bg); }
-    .stat-icon.red    { background: var(--danger-bg); }
-    .stat-icon.yellow { background: var(--warn-bg); }
-    .stat-label { font-size: .75rem; color: var(--gray-400); font-weight: 600; text-transform: uppercase; letter-spacing: .04em; }
-    .stat-value { font-size: 1.6rem; font-weight: 700; color: var(--gray-800); line-height: 1.1; }
 
-    /* ── Painel principal ── */
+    .stat-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: var(--radius);
+    }
+
+    .stat-icon.blue { color: var(--brand); background: var(--brand-soft); }
+    .stat-icon.green { color: var(--success); background: var(--success-soft); }
+    .stat-icon.yellow { color: var(--warning); background: var(--warning-soft); }
+    .stat-icon.red { color: var(--danger); background: var(--danger-soft); }
+    .stat-label { color: var(--muted); font-size: .74rem; font-weight: 800; text-transform: uppercase; letter-spacing: .04em; }
+    .stat-value { color: var(--ink); font-size: 1.7rem; line-height: 1.1; font-weight: 800; margin-top: 3px; }
+
     .panel {
-      background: #fff;
-      border-radius: 10px;
+      background: rgba(255, 255, 255, .96);
+      border: 1px solid rgba(219, 228, 238, .96);
+      border-radius: var(--radius);
       box-shadow: var(--shadow);
       overflow: hidden;
     }
 
-    /* ── Toolbar ── */
     .toolbar {
-      padding: 16px 20px;
-      border-bottom: 1px solid var(--gray-200);
+      padding: 16px;
+      border-bottom: 1px solid var(--line);
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 14px;
+      align-items: center;
+    }
+
+    .toolbar-title {
+      font-size: 1rem;
+      font-weight: 800;
+      color: var(--ink);
+    }
+
+    .toolbar-sub {
+      color: var(--muted);
+      font-size: .82rem;
+      margin-top: 3px;
+    }
+
+    .filters {
       display: flex;
       align-items: center;
-      gap: 12px;
+      justify-content: flex-end;
+      gap: 10px;
       flex-wrap: wrap;
     }
-    .toolbar-title { font-weight: 700; font-size: 1rem; color: var(--gray-800); margin-right: auto; }
+
+    .field {
+      min-height: 40px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: #fbfdff;
+      color: var(--ink);
+      font: inherit;
+      font-size: .86rem;
+      outline: none;
+      transition: border-color .2s, box-shadow .2s, background .2s;
+    }
+
+    .field:focus {
+      border-color: var(--brand);
+      background: #fff;
+      box-shadow: 0 0 0 4px rgba(23, 105, 170, .12);
+    }
 
     .input-search {
-      padding: 8px 12px;
-      border: 1.5px solid var(--gray-200);
-      border-radius: 7px;
-      font-family: 'Inter', sans-serif;
-      font-size: .85rem;
-      color: var(--gray-800);
-      background: var(--gray-50);
-      outline: none;
-      width: 220px;
-      transition: border-color .2s;
+      width: 260px;
+      padding: 0 12px 0 38px;
+      background-image: none;
     }
-    .input-search:focus { border-color: var(--brand-lt); background: #fff; }
 
-    .select-filtro {
-      padding: 8px 12px;
-      border: 1.5px solid var(--gray-200);
-      border-radius: 7px;
-      font-family: 'Inter', sans-serif;
-      font-size: .85rem;
-      color: var(--gray-800);
-      background: var(--gray-50);
-      outline: none;
-      cursor: pointer;
+    .search-wrap {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
     }
+
+    .search-wrap i {
+      position: absolute;
+      left: 12px;
+      color: var(--muted);
+      pointer-events: none;
+    }
+
+    .input-date { width: 154px; padding: 0 11px; }
+    .select-filtro { min-width: 156px; padding: 0 11px; cursor: pointer; }
 
     .btn {
-      padding: 8px 16px;
-      border: none;
-      border-radius: 7px;
-      font-family: 'Inter', sans-serif;
-      font-size: .85rem;
-      font-weight: 600;
+      min-height: 40px;
+      border-radius: var(--radius);
+      border: 0;
+      padding: 0 14px;
+      font: inherit;
+      font-size: .86rem;
+      font-weight: 800;
       cursor: pointer;
       display: inline-flex;
       align-items: center;
-      gap: 6px;
-      transition: opacity .2s;
+      justify-content: center;
+      gap: 8px;
       white-space: nowrap;
+      transition: opacity .2s, transform .12s, box-shadow .2s;
     }
-    .btn:hover { opacity: .85; }
-    .btn:disabled { opacity: .55; cursor: not-allowed; }
-    .btn-primary { background: var(--brand); color: #fff; }
-    .btn-success { background: var(--success); color: #fff; }
-    .btn-danger  { background: var(--danger); color: #fff; }
-    .btn-ghost   { background: var(--gray-100); color: var(--gray-600); border: 1px solid var(--gray-200); }
 
-    /* ── Tabela ── */
+    .btn:hover:not(:disabled) { opacity: .9; }
+    .btn:active:not(:disabled) { transform: scale(.99); }
+    .btn:disabled { opacity: .55; cursor: not-allowed; }
+    .btn-primary { color: #fff; background: linear-gradient(135deg, var(--brand), var(--brand-dark)); box-shadow: 0 10px 22px rgba(23, 105, 170, .18); }
+    .btn-success { color: #fff; background: var(--success); }
+    .btn-danger { color: #fff; background: var(--danger); }
+    .btn-ghost { color: var(--ink); background: #eef3f7; border: 1px solid var(--line); }
+    .btn-icon { width: 40px; padding: 0; }
+    .btn-sm { min-height: 32px; padding: 0 10px; font-size: .78rem; }
+
     .table-wrap { overflow-x: auto; }
 
-    table { width: 100%; border-collapse: collapse; font-size: .875rem; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: .86rem;
+      min-width: 1120px;
+    }
 
     thead th {
-      background: var(--gray-50);
-      color: var(--gray-600);
-      font-weight: 600;
-      font-size: .75rem;
-      text-transform: uppercase;
-      letter-spacing: .05em;
-      padding: 11px 16px;
+      position: sticky;
+      top: 68px;
+      z-index: 10;
+      padding: 12px 14px;
+      color: #526176;
+      background: #f8fbfd;
+      border-bottom: 1px solid var(--line);
       text-align: left;
-      border-bottom: 2px solid var(--gray-200);
+      font-size: .72rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: .04em;
       white-space: nowrap;
     }
 
     tbody td {
-      padding: 12px 16px;
-      border-bottom: 1px solid var(--gray-100);
-      color: var(--gray-800);
+      padding: 13px 14px;
+      border-bottom: 1px solid #edf2f7;
+      color: var(--ink);
       vertical-align: middle;
     }
 
-    tbody tr:last-child td { border-bottom: none; }
-    tbody tr:hover { background: var(--gray-50); }
+    tbody tr:hover { background: #f9fcff; }
+    tbody tr:last-child td { border-bottom: 0; }
+    .td-data { font-weight: 800; white-space: nowrap; }
+    .td-hora { color: var(--brand); font-weight: 800; white-space: nowrap; }
+    .td-fornecedor { font-weight: 700; min-width: 180px; }
+    .td-cnpj { color: var(--muted); font-family: ui-monospace, SFMono-Regular, Consolas, monospace; font-size: .82rem; }
+    .td-email { color: var(--muted); font-size: .82rem; max-width: 190px; overflow: hidden; text-overflow: ellipsis; }
+    .td-created { color: var(--muted); font-size: .8rem; white-space: nowrap; }
 
-    .td-data    { font-weight: 600; white-space: nowrap; }
-    .td-hora    { font-weight: 700; color: var(--brand); white-space: nowrap; }
-    .td-fornecedor { font-weight: 500; }
-    .td-cnpj    { font-family: monospace; font-size: .82rem; color: var(--gray-600); }
+    .doc-list, .acoes {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      flex-wrap: wrap;
+    }
 
     .link-doc {
+      min-height: 30px;
+      padding: 0 10px;
+      border-radius: var(--radius);
       display: inline-flex;
       align-items: center;
-      gap: 4px;
-      padding: 4px 10px;
-      border-radius: 5px;
-      font-size: .78rem;
-      font-weight: 600;
+      gap: 6px;
       text-decoration: none;
-      transition: opacity .2s;
+      font-size: .76rem;
+      font-weight: 800;
+      border: 1px solid transparent;
     }
-    .link-doc:hover { opacity: .8; }
-    .link-xml { background: #FFF3E0; color: #E65100; }
-    .link-pdf { background: #FCE4EC; color: #C62828; }
 
-    /* Badges */
+    .link-xml { color: #9a4d00; background: #fff4e6; border-color: #ffdfb4; }
+    .link-pdf { color: #a51d2d; background: #fff0f2; border-color: #ffd0d7; }
+
     .badge {
+      min-height: 28px;
+      padding: 0 10px;
+      border-radius: 999px;
       display: inline-flex;
       align-items: center;
-      gap: 5px;
-      padding: 3px 10px;
-      border-radius: 20px;
-      font-size: .75rem;
-      font-weight: 700;
+      gap: 6px;
+      font-size: .74rem;
+      font-weight: 800;
       white-space: nowrap;
+      border: 1px solid transparent;
     }
-    .badge-pendente  { background: var(--warn-bg);    color: var(--warn); }
-    .badge-cancelado { background: var(--danger-bg);  color: var(--danger); }
-    .badge-aprovado  { background: var(--success-bg); color: var(--success); }
-    .badge-reprovado { background: var(--danger-bg);  color: var(--danger); }
 
-    /* Acões agrupadas */
-    .acoes { display: flex; gap: 6px; flex-wrap: wrap; }
+    .badge-pendente { color: var(--warning); background: var(--warning-soft); border-color: #f5db9b; }
+    .badge-cancelado, .badge-reprovado { color: var(--danger); background: var(--danger-soft); border-color: #ffd1cc; }
+    .badge-aprovado { color: var(--success); background: var(--success-soft); border-color: #bde9d1; }
 
-    /* Spinner */
     .spinner {
-      width: 16px; height: 16px;
-      border: 2.5px solid rgba(255,255,255,.3);
+      width: 16px;
+      height: 16px;
+      border: 2.5px solid rgba(255,255,255,.35);
       border-top-color: #fff;
       border-radius: 50%;
       animation: spin .7s linear infinite;
       display: inline-block;
     }
+
     .spinner-dark {
-      border-color: var(--gray-200);
+      border-color: var(--line);
       border-top-color: var(--brand);
     }
+
     @keyframes spin { to { transform: rotate(360deg); } }
 
-    /* Loading / Empty */
     .loading-row td, .empty-row td {
       text-align: center;
-      padding: 48px;
-      color: var(--gray-400);
+      padding: 48px 24px;
+      color: var(--muted);
     }
-    .empty-state { text-align: center; padding: 56px 24px; color: var(--gray-400); }
-    .empty-state .icon { font-size: 40px; margin-bottom: 12px; display: block; }
-    .empty-state p { font-size: .9rem; }
 
-    /* Modal de confirmação */
+    .empty-state {
+      display: grid;
+      place-items: center;
+      gap: 10px;
+    }
+
+    .empty-icon {
+      width: 54px;
+      height: 54px;
+      border-radius: var(--radius);
+      color: var(--brand);
+      background: var(--brand-soft);
+    }
+
     .modal-overlay {
-      position: fixed; inset: 0;
-      background: rgba(0,0,0,.45);
-      display: flex; align-items: center; justify-content: center;
-      z-index: 200;
-      backdrop-filter: blur(3px);
-    }
-    .modal {
-      background: #fff;
-      border-radius: 12px;
-      padding: 28px;
-      width: 100%;
-      max-width: 380px;
-      box-shadow: 0 20px 60px rgba(0,0,0,.25);
-    }
-    .modal h3 { font-size: 1.05rem; margin-bottom: 8px; }
-    .modal p  { font-size: .9rem; color: var(--gray-600); margin-bottom: 20px; }
-    .modal-actions { display: flex; gap: 10px; justify-content: flex-end; }
-
-    /* Toast */
-    .toast {
       position: fixed;
-      bottom: 24px; right: 24px;
-      padding: 12px 18px;
-      border-radius: 8px;
-      font-size: .88rem;
-      font-weight: 600;
-      color: #fff;
-      z-index: 300;
-      box-shadow: 0 8px 24px rgba(0,0,0,.2);
+      inset: 0;
+      z-index: 100;
       display: flex;
       align-items: center;
-      gap: 8px;
+      justify-content: center;
+      padding: 18px;
+      background: rgba(15, 23, 42, .5);
+      backdrop-filter: blur(4px);
     }
-    .toast-success { background: var(--success); }
-    .toast-error   { background: var(--danger); }
 
-    @media (max-width: 900px) {
-      .stats-grid { grid-template-columns: repeat(2, 1fr); }
+    .modal {
+      width: min(420px, 100%);
+      background: #fff;
+      border-radius: var(--radius);
+      border: 1px solid var(--line);
+      box-shadow: 0 24px 70px rgba(15, 23, 42, .25);
+      padding: 24px;
     }
-    @media (max-width: 600px) {
-      main { padding: 16px; }
-      .stats-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
-      .toolbar { flex-direction: column; align-items: stretch; }
-      .input-search { width: 100%; }
-      .toolbar-title { margin-right: 0; }
+
+    .modal h3 {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      font-size: 1.08rem;
+      margin-bottom: 9px;
+    }
+
+    .modal h3 i { color: var(--danger); }
+    .modal p { color: var(--muted); font-size: .92rem; line-height: 1.55; margin-bottom: 20px; }
+    .modal-actions { display: flex; justify-content: flex-end; gap: 10px; }
+
+    .toast {
+      position: fixed;
+      right: 22px;
+      bottom: 22px;
+      z-index: 120;
+      min-height: 44px;
+      max-width: min(420px, calc(100vw - 32px));
+      padding: 0 16px;
+      border-radius: var(--radius);
+      color: #fff;
+      box-shadow: var(--shadow);
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      font-size: .9rem;
+      font-weight: 800;
+    }
+
+    .toast-success { background: var(--success); }
+    .toast-error { background: var(--danger); }
+
+    @media (max-width: 1100px) {
+      .stats-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .toolbar { grid-template-columns: 1fr; }
+      .filters { justify-content: flex-start; }
+    }
+
+    @media (max-width: 640px) {
+      header { align-items: flex-start; }
+      .header-sub, .header-badge span { display: none; }
+      .stats-grid { grid-template-columns: 1fr; }
+      .filters, .search-wrap, .input-search, .input-date, .select-filtro { width: 100%; }
+      .btn { width: 100%; }
+      .btn-icon { width: 40px; }
+      .modal-actions { flex-direction: column-reverse; }
     }
   </style>
 </head>
@@ -327,72 +444,91 @@
 
   <header>
     <div class="header-left">
-      <div class="header-icon">📋</div>
-      <h1>Painel de Agendamentos</h1>
-      <span class="header-badge" x-text="agendamentos.length + ' registros'"></span>
+      <div class="header-icon"><i data-lucide="layout-dashboard" width="22" height="22"></i></div>
+      <div>
+        <h1>Painel de Agendamentos</h1>
+        <div class="header-sub">Acompanhe, aprove e gerencie entregas</div>
+      </div>
     </div>
-    <button class="btn-sair" onclick="window.location.href='index.html'">⬅ Sair</button>
+    <div class="header-actions">
+      <span class="header-badge">
+        <i data-lucide="database" width="16" height="16"></i>
+        <span x-text="agendamentos.length + ' registros'"></span>
+      </span>
+      <button class="btn btn-ghost" onclick="window.location.href='index.html'">
+        <i data-lucide="log-out" width="17" height="17"></i> Sair
+      </button>
+    </div>
   </header>
 
   <main>
-
-    <div class="stats-grid">
+    <section class="stats-grid" aria-label="Indicadores">
       <div class="stat-card">
-        <div class="stat-icon blue">📦</div>
+        <div class="stat-icon blue"><i data-lucide="package-check" width="22" height="22"></i></div>
         <div>
-          <div class="stat-label">Total Agendados</div>
-          <div class="stat-value" x-text="stats.agendados ?? '—'"></div>
+          <div class="stat-label">Total agendados</div>
+          <div class="stat-value" x-text="stats.agendados ?? '-'"></div>
         </div>
       </div>
       <div class="stat-card">
-        <div class="stat-icon green">📅</div>
+        <div class="stat-icon green"><i data-lucide="calendar-check" width="22" height="22"></i></div>
         <div>
           <div class="stat-label">Hoje</div>
-          <div class="stat-value" x-text="stats.hoje ?? '—'"></div>
+          <div class="stat-value" x-text="stats.hoje ?? '-'"></div>
         </div>
       </div>
       <div class="stat-card">
-        <div class="stat-icon yellow">🗓️</div>
+        <div class="stat-icon yellow"><i data-lucide="calendar-range" width="22" height="22"></i></div>
         <div>
-          <div class="stat-label">Esta Semana</div>
-          <div class="stat-value" x-text="stats.semana ?? '—'"></div>
+          <div class="stat-label">Esta semana</div>
+          <div class="stat-value" x-text="stats.semana ?? '-'"></div>
         </div>
       </div>
       <div class="stat-card">
-        <div class="stat-icon red">❌</div>
+        <div class="stat-icon red"><i data-lucide="calendar-x" width="22" height="22"></i></div>
         <div>
           <div class="stat-label">Cancelados</div>
-          <div class="stat-value" x-text="stats.cancelados ?? '—'"></div>
+          <div class="stat-value" x-text="stats.cancelados ?? '-'"></div>
         </div>
       </div>
-    </div>
+    </section>
 
-    <div class="panel">
-
+    <section class="panel">
       <div class="toolbar">
-        <span class="toolbar-title">Agendamentos</span>
+        <div>
+          <div class="toolbar-title">Agendamentos</div>
+          <div class="toolbar-sub">Use filtros para encontrar fornecedores, datas e pendencias.</div>
+        </div>
 
-        <input class="input-search" type="text"
-               placeholder="🔍 Buscar fornecedor ou CNPJ..."
-               x-model="filtros.busca"
-               @input.debounce.400ms="aplicarFiltros()">
+        <div class="filters">
+          <label class="search-wrap">
+            <i data-lucide="search" width="17" height="17"></i>
+            <input class="field input-search" type="text"
+                   placeholder="Buscar fornecedor ou CNPJ"
+                   x-model="filtros.busca"
+                   @input.debounce.400ms="aplicarFiltros()">
+          </label>
 
-        <input class="input-search" type="date" style="width:160px;"
-               x-model="filtros.data"
-               @change="aplicarFiltros()">
+          <input class="field input-date" type="date"
+                 x-model="filtros.data"
+                 @change="aplicarFiltros()">
 
-        <select class="select-filtro" x-model="filtros.status" @change="aplicarFiltros()">
-          <option value="">Todos os status</option>
-          <option value="PENDENTE">Pendente</option>
-          <option value="CANCELADO">Cancelado</option>
-        </select>
+          <select class="field select-filtro" x-model="filtros.status" @change="aplicarFiltros()">
+            <option value="">Todos os status</option>
+            <option value="PENDENTE">Pendente</option>
+            <option value="CANCELADO">Cancelado</option>
+          </select>
 
-        <button class="btn btn-ghost" @click="limparFiltros()">Limpar</button>
+          <button class="btn btn-ghost" @click="limparFiltros()">
+            <i data-lucide="eraser" width="17" height="17"></i> Limpar
+          </button>
 
-        <button class="btn btn-primary" @click="carregar()" :disabled="carregando">
-          <span class="spinner" x-show="carregando" style="border-top-color:#fff;"></span>
-          <span x-text="carregando ? 'Atualizando...' : '↻ Atualizar'"></span>
-        </button>
+          <button class="btn btn-primary" @click="carregar()" :disabled="carregando">
+            <span class="spinner" x-show="carregando"></span>
+            <span x-show="!carregando"><i data-lucide="refresh-cw" width="17" height="17"></i></span>
+            <span x-text="carregando ? 'Atualizando...' : 'Atualizar'"></span>
+          </button>
+        </div>
       </div>
 
       <div class="table-wrap">
@@ -406,13 +542,12 @@
               <th>Email</th>
               <th>Documentos</th>
               <th>Status</th>
-              <th>Aprovação</th>
+              <th>Aprovacao</th>
               <th>Criado em</th>
-              <th>Ações</th>
+              <th>Acoes</th>
             </tr>
           </thead>
           <tbody>
-
             <tr class="loading-row" x-show="carregando">
               <td colspan="10">
                 <span class="spinner spinner-dark"></span>
@@ -423,82 +558,77 @@
             <tr class="empty-row" x-show="!carregando && filtrados.length === 0">
               <td colspan="10">
                 <div class="empty-state">
-                  <span class="icon">📭</span>
-                  <p x-text="agendamentos.length === 0
-                    ? 'Nenhum agendamento encontrado.'
-                    : 'Nenhum resultado para os filtros aplicados.'">
-                  </p>
+                  <span class="empty-icon"><i data-lucide="inbox" width="25" height="25"></i></span>
+                  <p x-text="agendamentos.length === 0 ? 'Nenhum agendamento encontrado.' : 'Nenhum resultado para os filtros aplicados.'"></p>
                 </div>
               </td>
             </tr>
 
             <template x-for="row in filtrados" :key="row.id">
               <tr>
-                <td class="td-data"      x-text="row.dataFormatada"></td>
-                <td class="td-hora"      x-text="row.horario"></td>
+                <td class="td-data" x-text="row.dataFormatada"></td>
+                <td class="td-hora" x-text="row.horario"></td>
                 <td class="td-fornecedor" x-text="row.fornecedor"></td>
-                <td class="td-cnpj"      x-text="row.cnpj"></td>
-                <td style="font-size:.82rem;" x-text="row.email"></td>
+                <td class="td-cnpj" x-text="row.cnpj"></td>
+                <td class="td-email" x-text="row.email"></td>
 
                 <td>
-                  <div style="display:flex;gap:6px;flex-wrap:wrap;">
-                    <a class="link-doc link-xml" :href="row.urlXml" target="_blank"
-                       x-show="row.urlXml">📄 XML</a>
-                    <a class="link-doc link-pdf" :href="row.urlPdf" target="_blank"
-                       x-show="row.urlPdf">🖨️ PDF</a>
+                  <div class="doc-list">
+                    <a class="link-doc link-xml" :href="row.urlXml" target="_blank" x-show="row.urlXml">
+                      <i data-lucide="file-code-2" width="15" height="15"></i> XML
+                    </a>
+                    <a class="link-doc link-pdf" :href="row.urlPdf" target="_blank" x-show="row.urlPdf">
+                      <i data-lucide="file-text" width="15" height="15"></i> PDF
+                    </a>
                   </div>
                 </td>
 
                 <td>
-                  <span class="badge badge-pendente"  x-show="row.status === 'PENDENTE'">⏳ Pendente</span>
-                  <span class="badge badge-cancelado" x-show="row.status === 'CANCELADO'">✕ Cancelado</span>
+                  <span class="badge badge-pendente" x-show="row.status === 'PENDENTE'"><i data-lucide="clock-3" width="14" height="14"></i> Pendente</span>
+                  <span class="badge badge-cancelado" x-show="row.status === 'CANCELADO'"><i data-lucide="x" width="14" height="14"></i> Cancelado</span>
                 </td>
 
                 <td>
-                  <span class="badge badge-pendente"  x-show="row.aprovacao === 'PENDENTE'">⏳ Pendente</span>
-                  <span class="badge badge-aprovado"  x-show="row.aprovacao === 'APROVADO'">✓ Aprovado</span>
-                  <span class="badge badge-reprovado" x-show="row.aprovacao === 'REPROVADO'">✕ Reprovado</span>
+                  <span class="badge badge-pendente" x-show="row.aprovacao === 'PENDENTE'"><i data-lucide="clock-3" width="14" height="14"></i> Pendente</span>
+                  <span class="badge badge-aprovado" x-show="row.aprovacao === 'APROVADO'"><i data-lucide="check" width="14" height="14"></i> Aprovado</span>
+                  <span class="badge badge-reprovado" x-show="row.aprovacao === 'REPROVADO'"><i data-lucide="x" width="14" height="14"></i> Reprovado</span>
                 </td>
 
-                <td style="font-size:.8rem;color:var(--gray-400);white-space:nowrap;" x-text="row.criadoEm"></td>
+                <td class="td-created" x-text="row.criadoEm"></td>
 
                 <td>
                   <div class="acoes">
-                    <button class="btn btn-danger" style="font-size:.78rem;padding:5px 10px;"
+                    <button class="btn btn-danger btn-sm"
                             x-show="row.status === 'PENDENTE'"
                             @click="confirmarCancelamento(row)">
-                      Cancelar
+                      <i data-lucide="ban" width="14" height="14"></i> Cancelar
                     </button>
 
                     <template x-if="row.status === 'PENDENTE' && row.aprovacao === 'PENDENTE'">
                       <div class="acoes">
-                        <button class="btn btn-success" style="font-size:.78rem;padding:5px 10px;"
-                                @click="aprovar(row.id)">
-                          ✓ Aprovar
+                        <button class="btn btn-success btn-sm" @click="aprovar(row.id)">
+                          <i data-lucide="check" width="14" height="14"></i> Aprovar
                         </button>
-                        <button class="btn btn-danger" style="font-size:.78rem;padding:5px 10px;"
-                                @click="reprovar(row.id)">
-                          ✕ Reprovar
+                        <button class="btn btn-danger btn-sm" @click="reprovar(row.id)">
+                          <i data-lucide="x" width="14" height="14"></i> Reprovar
                         </button>
                       </div>
                     </template>
 
-                    <span style="color:var(--gray-400);font-size:.8rem;"
-                          x-show="row.status === 'CANCELADO'">—</span>
+                    <span style="color:var(--muted);font-size:.82rem;" x-show="row.status === 'CANCELADO'">-</span>
                   </div>
                 </td>
               </tr>
             </template>
-
           </tbody>
         </table>
       </div>
-
-    </div></main>
+    </section>
+  </main>
 
   <div class="modal-overlay" x-show="modal.aberto" x-transition style="display:none;">
     <div class="modal" @click.stop>
-      <h3>⚠️ Cancelar agendamento?</h3>
+      <h3><i data-lucide="triangle-alert" width="20" height="20"></i> Cancelar agendamento?</h3>
       <p>
         Deseja cancelar o agendamento de
         <strong x-text="modal.row?.fornecedor"></strong>
@@ -517,51 +647,57 @@
 
   <div class="toast"
        :class="toast.tipo === 'sucesso' ? 'toast-success' : 'toast-error'"
-       x-show="toast.msg" x-transition style="display:none;"
-       x-text="toast.msg">
+       x-show="toast.msg" x-transition style="display:none;">
+    <span x-html="toast.tipo === 'sucesso' ? '<i data-lucide=&quot;circle-check&quot; width=&quot;18&quot; height=&quot;18&quot;></i>' : '<i data-lucide=&quot;circle-alert&quot; width=&quot;18&quot; height=&quot;18&quot;></i>'"></span>
+    <span x-text="toast.msg"></span>
   </div>
 
 <script>
-// ============================================================
-// CONFIGURAÇÃO DA API DO GOOGLE APPS SCRIPT
-// ============================================================
 const URL_AP_SCRIPT = "https://script.google.com/macros/s/AKfycbz5aXhKJlI44UZblriJLiK88JjxHK3aod7hnPJ5PsSsx9TrVkvADeahBz1xQzGeNoYi/exec";
+
+function renderIcons() {
+  if (window.lucide) setTimeout(() => lucide.createIcons(), 0);
+}
+
+document.addEventListener('alpine:init', () => {
+  Alpine.effect(() => renderIcons());
+});
 
 function painel() {
   return {
-    carregando   : false,
-    agendamentos : [],
-    filtrados    : [],
-    stats        : {},
+    carregando: false,
+    agendamentos: [],
+    filtrados: [],
+    stats: {},
 
     filtros: {
-      busca : '',
-      data  : '',
+      busca: '',
+      data: '',
       status: ''
     },
 
     modal: {
-      aberto    : false,
-      row       : null,
+      aberto: false,
+      row: null,
       cancelando: false
     },
 
     toast: {
-      msg : '',
+      msg: '',
       tipo: ''
     },
 
     init() {
+      renderIcons();
       this.carregar();
     },
 
-    // Centralizador de requisições Fetch para simplificar chamadas à API externa
     async chamarAPI(action, paramData = {}) {
       try {
         const response = await fetch(URL_AP_SCRIPT, {
           method: 'POST',
           mode: 'cors',
-          headers: { 'Content-Type': 'text/plain' }, // Evita preflight complexo do CORS no Apps Script
+          headers: { 'Content-Type': 'text/plain' },
           body: JSON.stringify({ action: action, data: paramData })
         });
         return await response.json();
@@ -574,19 +710,18 @@ function painel() {
     async carregar() {
       this.carregando = true;
 
-      // Buscar Estatísticas
       this.chamarAPI('obterEstatisticas')
         .then(s => { this.stats = s || {}; })
         .catch(err => { console.error('stats error', err); });
 
-      // Buscar Lista de Agendamentos
       this.chamarAPI('listarAgendamentos', {})
         .then(lista => {
-          this.carregando  = false;
+          this.carregando = false;
           this.agendamentos = Array.isArray(lista) ? lista : [];
           this.aplicarFiltros();
+          renderIcons();
         })
-        .catch(err => {
+        .catch(() => {
           this.carregando = false;
           this.mostrarToast('Erro ao carregar agendamentos.', 'erro');
         });
@@ -602,20 +737,23 @@ function painel() {
         if (busca) {
           const b = busca.toLowerCase();
           const fornecedor = (row.fornecedor || '').toLowerCase();
-          const cnpj       = (row.cnpj || '').toLowerCase();
+          const cnpj = (row.cnpj || '').toLowerCase();
           if (!fornecedor.includes(b) && !cnpj.includes(b)) return false;
         }
         return true;
       });
+      renderIcons();
     },
 
     limparFiltros() {
-      this.filtros   = { busca: '', data: '', status: '' };
+      this.filtros = { busca: '', data: '', status: '' };
       this.filtrados = [...this.agendamentos];
+      renderIcons();
     },
 
     confirmarCancelamento(row) {
       this.modal = { aberto: true, row, cancelando: false };
+      renderIcons();
     },
 
     executarCancelamento() {
@@ -629,7 +767,7 @@ function painel() {
             const idx = this.agendamentos.findIndex(r => r.id === id);
             if (idx !== -1) {
               this.agendamentos[idx].status = 'CANCELADO';
-              this.stats.agendados  = Math.max(0, (this.stats.agendados  || 1) - 1);
+              this.stats.agendados = Math.max(0, (this.stats.agendados || 1) - 1);
               this.stats.cancelados = (this.stats.cancelados || 0) + 1;
             }
             this.aplicarFiltros();
@@ -680,6 +818,7 @@ function painel() {
 
     mostrarToast(msg, tipo) {
       this.toast = { msg, tipo };
+      renderIcons();
       setTimeout(() => { this.toast.msg = ''; }, 4000);
     }
   };

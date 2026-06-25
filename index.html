@@ -7,317 +7,469 @@
   <title>Agendamento de Entregas</title>
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
   <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
   <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/pt.js"></script>
-
+  <script src="https://unpkg.com/lucide@latest"></script>
   <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --brand     : #1B5E91;
-      --brand-lt  : #2980B9;
-      --brand-bg  : #EBF4FB;
-      --success   : #1A7A4A;
-      --success-bg: #D4EDDA;
-      --danger    : #922B21;
-      --danger-bg : #FADBD8;
-      --warn      : #7D6608;
-      --warn-bg   : #FEF9E7;
-      --gray-50   : #F8FAFC;
-      --gray-100  : #F1F5F9;
-      --gray-200  : #E2E8F0;
-      --gray-400  : #94A3B8;
-      --gray-600  : #475569;
-      --gray-800  : #1E293B;
-      --radius    : 10px;
-      --shadow    : 0 4px 24px rgba(0,0,0,.10);
+      --brand: #1769aa;
+      --brand-dark: #0f416f;
+      --brand-soft: #e8f3fb;
+      --accent: #00a39b;
+      --success: #16824a;
+      --success-soft: #e8f7ef;
+      --danger: #b42318;
+      --danger-soft: #fff0ee;
+      --warning: #b7791f;
+      --warning-soft: #fff7e6;
+      --ink: #172033;
+      --muted: #64748b;
+      --line: #dbe4ee;
+      --surface: #ffffff;
+      --canvas: #f6f8fb;
+      --radius: 8px;
+      --shadow: 0 18px 50px rgba(15, 35, 60, .12);
+      --shadow-sm: 0 8px 24px rgba(15, 35, 60, .08);
     }
 
     body {
       font-family: 'Inter', sans-serif;
-      background: var(--gray-100);
       min-height: 100vh;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at top left, rgba(0, 163, 155, .14), transparent 30%),
+        linear-gradient(180deg, #eef5fb 0%, var(--canvas) 38%, #fff 100%);
       display: flex;
       flex-direction: column;
     }
 
-    /* ── Cabeçalho ── */
     header {
-      background: var(--brand);
-      color: #fff;
-      padding: 16px 24px;
+      min-height: 72px;
+      padding: 14px clamp(16px, 4vw, 40px);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      border-bottom: 1px solid rgba(219, 228, 238, .8);
+      background: rgba(255, 255, 255, .82);
+      backdrop-filter: blur(14px);
+      position: sticky;
+      top: 0;
+      z-index: 20;
+    }
+
+    .brand {
       display: flex;
       align-items: center;
       gap: 12px;
-      box-shadow: 0 2px 8px rgba(0,0,0,.2);
+      min-width: 0;
     }
-    header .logo-icon {
-      width: 40px; height: 40px;
-      background: rgba(255,255,255,.15);
-      border-radius: 8px;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 20px;
-    }
-    header h1 { font-size: 1.15rem; font-weight: 700; }
-    header p  { font-size: .78rem; opacity: .8; margin-top: 1px; }
 
-    /* ── Layout ── */
+    .brand-icon, .mini-icon, .success-icon {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .brand-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: var(--radius);
+      color: #fff;
+      background: linear-gradient(135deg, var(--brand), var(--accent));
+      box-shadow: var(--shadow-sm);
+    }
+
+    header h1 { font-size: 1.05rem; font-weight: 800; letter-spacing: 0; }
+    header p { color: var(--muted); font-size: .82rem; margin-top: 2px; }
+
+    .admin-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      min-height: 38px;
+      padding: 0 14px;
+      border-radius: var(--radius);
+      border: 1px solid var(--line);
+      color: var(--brand-dark);
+      background: #fff;
+      font-size: .86rem;
+      font-weight: 700;
+      text-decoration: none;
+      box-shadow: var(--shadow-sm);
+      white-space: nowrap;
+    }
+
     main {
       flex: 1;
+      width: min(1180px, 100%);
+      margin: 0 auto;
+      padding: clamp(20px, 4vw, 44px) 16px;
+      display: grid;
+      grid-template-columns: minmax(0, .9fr) minmax(360px, 560px);
+      gap: clamp(20px, 4vw, 42px);
+      align-items: start;
+    }
+
+    .intro {
+      padding: 18px 0 0;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--brand-dark);
+      background: var(--brand-soft);
+      border: 1px solid #cfe6f7;
+      border-radius: 999px;
+      padding: 7px 12px;
+      font-size: .78rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: .04em;
+    }
+
+    .intro h2 {
+      margin-top: 18px;
+      font-size: clamp(2rem, 5vw, 4rem);
+      line-height: 1;
+      font-weight: 800;
+      letter-spacing: 0;
+      color: var(--ink);
+      max-width: 620px;
+    }
+
+    .intro p {
+      margin-top: 16px;
+      color: var(--muted);
+      font-size: 1rem;
+      line-height: 1.7;
+      max-width: 580px;
+    }
+
+    .support-list {
+      display: grid;
+      gap: 12px;
+      margin-top: 28px;
+      max-width: 520px;
+    }
+
+    .support-item {
       display: flex;
       align-items: flex-start;
-      justify-content: center;
-      padding: 32px 16px;
+      gap: 12px;
+      color: var(--muted);
+      font-size: .92rem;
+      line-height: 1.5;
+    }
+
+    .support-item .mini-icon {
+      width: 34px;
+      height: 34px;
+      border-radius: var(--radius);
+      color: var(--brand);
+      background: #fff;
+      border: 1px solid var(--line);
     }
 
     .card {
-      background: #fff;
+      width: 100%;
+      background: rgba(255, 255, 255, .94);
+      border: 1px solid rgba(219, 228, 238, .95);
       border-radius: var(--radius);
       box-shadow: var(--shadow);
-      width: 100%;
-      max-width: 560px;
-      padding: 32px;
+      padding: clamp(20px, 4vw, 30px);
     }
 
-    .card-title {
-      font-size: 1.1rem;
-      font-weight: 700;
-      color: var(--brand);
+    .steps {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
       margin-bottom: 24px;
-      padding-bottom: 14px;
-      border-bottom: 2px solid var(--brand-bg);
+    }
+
+    .step {
+      min-height: 54px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 9px;
+      color: var(--muted);
+      background: #fff;
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 9px;
+      font-size: .78rem;
+      font-weight: 800;
     }
 
-    /* ── Formulário ── */
-    .form-group { margin-bottom: 18px; }
+    .step-num {
+      width: 28px;
+      height: 28px;
+      border-radius: 999px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #eef3f7;
+      color: var(--muted);
+      flex-shrink: 0;
+    }
+
+    .step.active { border-color: #9cd4f4; background: var(--brand-soft); color: var(--brand-dark); }
+    .step.active .step-num { background: var(--brand); color: #fff; }
+    .step.done { border-color: #bde9d1; background: var(--success-soft); color: var(--success); }
+    .step.done .step-num { background: var(--success); color: #fff; }
+
+    .section-title {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 22px;
+      font-size: 1.08rem;
+      font-weight: 800;
+      color: var(--ink);
+    }
+
+    .section-title i { color: var(--brand); }
+
+    .form-group { margin-bottom: 17px; }
 
     label {
       display: block;
-      font-size: .82rem;
-      font-weight: 600;
-      color: var(--gray-600);
-      margin-bottom: 6px;
-      letter-spacing: .02em;
+      margin-bottom: 7px;
+      color: #40516a;
+      font-size: .79rem;
+      font-weight: 800;
       text-transform: uppercase;
+      letter-spacing: .04em;
     }
 
     input, select {
       width: 100%;
-      padding: 10px 14px;
-      border: 1.5px solid var(--gray-200);
-      border-radius: 7px;
-      font-family: 'Inter', sans-serif;
-      font-size: .92rem;
-      color: var(--gray-800);
-      background: var(--gray-50);
-      transition: border-color .2s, box-shadow .2s;
+      min-height: 44px;
+      padding: 0 13px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      color: var(--ink);
+      background: #fbfdff;
+      font: inherit;
+      font-size: .93rem;
       outline: none;
+      transition: border-color .2s, box-shadow .2s, background .2s;
     }
+
     input:focus, select:focus {
-      border-color: var(--brand-lt);
-      box-shadow: 0 0 0 3px rgba(41,128,185,.15);
+      border-color: var(--brand);
       background: #fff;
+      box-shadow: 0 0 0 4px rgba(23, 105, 170, .12);
     }
-    input::placeholder { color: var(--gray-400); }
-    select { cursor: pointer; }
-    select:disabled { opacity: .55; cursor: not-allowed; }
 
-    /* Upload */
-    .upload-area {
-      border: 2px dashed var(--gray-200);
-      border-radius: 7px;
-      padding: 16px;
-      text-align: center;
-      background: var(--gray-50);
-      cursor: pointer;
-      transition: border-color .2s, background .2s;
-      position: relative;
-    }
-    .upload-area:hover { border-color: var(--brand-lt); background: var(--brand-bg); }
-    .upload-area input[type="file"] {
-      position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%;
-    }
-    .upload-area .icon { font-size: 24px; margin-bottom: 4px; }
-    .upload-area .label-main { font-size: .88rem; font-weight: 600; color: var(--brand); }
-    .upload-area .label-sub  { font-size: .76rem; color: var(--gray-400); margin-top: 2px; }
-    .upload-area.tem-arquivo { border-color: var(--success); background: var(--success-bg); }
-    .upload-area.tem-arquivo .label-main { color: var(--success); }
+    input::placeholder { color: #94a3b8; }
+    select:disabled { color: #94a3b8; cursor: not-allowed; }
 
-    /* Grid 2 colunas */
-    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
 
-    /* Botão principal */
-    .btn-primary {
-      width: 100%;
-      padding: 13px;
-      background: var(--brand);
-      color: #fff;
-      border: none;
-      border-radius: 8px;
-      font-family: 'Inter', sans-serif;
-      font-size: 1rem;
-      font-weight: 600;
-      cursor: pointer;
+    .helper-text {
       display: flex;
       align-items: center;
-      justify-content: center;
-      gap: 8px;
-      transition: background .2s, transform .1s;
-      margin-top: 8px;
+      gap: 7px;
+      color: var(--muted);
+      font-size: .8rem;
+      margin-top: 7px;
     }
-    .btn-primary:hover:not(:disabled) { background: var(--brand-lt); }
-    .btn-primary:active:not(:disabled) { transform: scale(.98); }
-    .btn-primary:disabled { opacity: .6; cursor: not-allowed; }
 
-    /* Spinner */
+    .upload-area {
+      position: relative;
+      min-height: 116px;
+      border: 1.5px dashed #b8c7d8;
+      border-radius: var(--radius);
+      padding: 18px;
+      text-align: center;
+      background: #fbfdff;
+      cursor: pointer;
+      display: grid;
+      place-items: center;
+      transition: border-color .2s, background .2s, transform .2s;
+    }
+
+    .upload-area:hover { border-color: var(--brand); background: var(--brand-soft); transform: translateY(-1px); }
+    .upload-area input[type="file"] { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+    .upload-area .upload-icon { color: var(--brand); margin-bottom: 8px; }
+    .upload-area .label-main { color: var(--ink); font-size: .92rem; font-weight: 800; word-break: break-word; }
+    .upload-area .label-sub { color: var(--muted); font-size: .8rem; margin-top: 3px; }
+    .upload-area.tem-arquivo { border-color: #7cd2a0; background: var(--success-soft); }
+    .upload-area.tem-arquivo .upload-icon, .upload-area.tem-arquivo .label-main { color: var(--success); }
+
+    .btn-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 8px; }
+
+    .btn {
+      min-height: 46px;
+      border: 0;
+      border-radius: var(--radius);
+      padding: 0 16px;
+      font: inherit;
+      font-weight: 800;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 9px;
+      transition: transform .12s, box-shadow .2s, background .2s, opacity .2s;
+    }
+
+    .btn:active:not(:disabled) { transform: scale(.99); }
+    .btn:disabled { opacity: .6; cursor: not-allowed; }
+    .btn-primary { width: 100%; color: #fff; background: linear-gradient(135deg, var(--brand), var(--brand-dark)); box-shadow: 0 12px 28px rgba(23, 105, 170, .2); }
+    .btn-primary:hover:not(:disabled) { box-shadow: 0 16px 34px rgba(23, 105, 170, .28); }
+    .btn-secondary { color: var(--ink); background: #eef3f7; border: 1px solid var(--line); }
+    .btn-outline { color: var(--brand-dark); background: #fff; border: 1px solid #b9d8ee; }
+
     .spinner {
-      width: 18px; height: 18px;
+      width: 18px;
+      height: 18px;
       border: 2.5px solid rgba(255,255,255,.35);
       border-top-color: #fff;
       border-radius: 50%;
       animation: spin .7s linear infinite;
-      display: inline-block;
     }
+
     @keyframes spin { to { transform: rotate(360deg); } }
 
-    /* Alertas */
     .alert {
-      padding: 13px 16px;
-      border-radius: 8px;
-      font-size: .9rem;
-      font-weight: 500;
-      margin-bottom: 20px;
+      margin-bottom: 18px;
+      padding: 13px 14px;
+      border-radius: var(--radius);
       display: flex;
       align-items: flex-start;
       gap: 10px;
+      font-size: .9rem;
+      font-weight: 700;
+      border: 1px solid transparent;
     }
-    .alert-error   { background: var(--danger-bg);  color: var(--danger);  }
-    .alert-success { background: var(--success-bg); color: var(--success); }
 
-    /* Progress steps */
-    .steps {
-      display: flex;
-      justify-content: center;
-      gap: 24px;
-      margin-bottom: 28px;
-    }
-    .step {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      font-size: .8rem;
-      font-weight: 600;
-      color: var(--gray-400);
-    }
-    .step.active { color: var(--brand); }
-    .step.done   { color: var(--success); }
-    .step-num {
-      width: 26px; height: 26px;
-      border-radius: 50%;
-      background: var(--gray-200);
-      color: var(--gray-600);
-      display: flex; align-items: center; justify-content: center;
-      font-size: .75rem; font-weight: 700;
-      flex-shrink: 0;
-    }
-    .step.active .step-num { background: var(--brand); color: #fff; }
-    .step.done   .step-num { background: var(--success); color: #fff; }
+    .alert-error { background: var(--danger-soft); color: var(--danger); border-color: #ffd1cc; }
+    .alert-success { background: var(--success-soft); color: var(--success); border-color: #bde9d1; }
 
-    /* Sucesso final */
-    .success-screen {
-      text-align: center;
-      padding: 16px 0;
-    }
-    .success-icon {
-      font-size: 56px;
-      margin-bottom: 16px;
-      display: block;
-    }
-    .success-screen h3 { font-size: 1.2rem; color: var(--success); margin-bottom: 8px; }
-    .success-screen p  { color: var(--gray-600); font-size: .92rem; margin-bottom: 24px; }
-    .success-detail {
-      background: var(--gray-100);
-      border-radius: 8px;
-      padding: 16px;
+    .success-screen { text-align: center; padding: 8px 0 0; }
+    .success-icon { width: 66px; height: 66px; border-radius: 999px; margin: 0 auto 16px; color: #fff; background: var(--success); }
+    .success-screen h3 { color: var(--ink); font-size: 1.35rem; margin-bottom: 8px; }
+    .success-screen p { color: var(--muted); font-size: .93rem; line-height: 1.55; margin-bottom: 12px; }
+
+    .notice {
+      margin: 14px 0 18px;
+      padding: 12px 13px;
+      border-radius: var(--radius);
+      background: var(--warning-soft);
+      color: #77510d;
       text-align: left;
-      margin-bottom: 20px;
+      border: 1px solid #f5db9b;
+      font-size: .86rem;
+      line-height: 1.5;
     }
-    .success-detail dl { display: grid; grid-template-columns: 1fr 1fr; gap: 10px 16px; }
-    .success-detail dt { font-size: .75rem; text-transform: uppercase; color: var(--gray-400); font-weight: 600; }
-    .success-detail dd { font-size: .9rem; color: var(--gray-800); font-weight: 500; }
-    .btn-novo {
-      background: none; border: 2px solid var(--brand); color: var(--brand);
-      border-radius: 8px; padding: 10px 24px; font-family: 'Inter', sans-serif;
-      font-size: .92rem; font-weight: 600; cursor: pointer;
-      transition: background .2s, color .2s;
-    }
-    .btn-novo:hover { background: var(--brand); color: #fff; }
 
-    /* Rodapé */
-    footer {
-      text-align: center;
+    .success-detail {
+      margin: 18px 0;
       padding: 16px;
-      font-size: .75rem;
-      color: var(--gray-400);
+      border-radius: var(--radius);
+      background: #f8fbfd;
+      border: 1px solid var(--line);
+      text-align: left;
     }
 
-    @media (max-width: 480px) {
-      .card { padding: 20px; }
-      .grid-2 { grid-template-columns: 1fr; }
-      .step span { display: none; }
+    .success-detail dl { display: grid; grid-template-columns: 1fr 1fr; gap: 12px 16px; }
+    .success-detail dt { color: var(--muted); font-size: .73rem; font-weight: 800; text-transform: uppercase; letter-spacing: .04em; }
+    .success-detail dd { color: var(--ink); font-size: .9rem; font-weight: 700; word-break: break-word; }
+
+    footer {
+      color: var(--muted);
+      text-align: center;
+      padding: 18px;
+      font-size: .78rem;
+    }
+
+    @media (max-width: 900px) {
+      main { grid-template-columns: 1fr; }
+      .intro { padding-top: 4px; }
+      .support-list { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 560px) {
+      header { align-items: flex-start; }
+      header p { display: none; }
+      .admin-link span { display: none; }
+      .admin-link { width: 40px; padding: 0; justify-content: center; }
+      .steps { grid-template-columns: 1fr; }
+      .grid-2, .btn-row, .success-detail dl { grid-template-columns: 1fr; }
     }
   </style>
 </head>
 <body>
 
 <header>
-  <div class="logo-icon">📦</div>
-  <div>
-    <h1>Portal de Entregas</h1>
-    <p>Agendamento de recebimento de mercadorias</p>
+  <div class="brand">
+    <div class="brand-icon"><i data-lucide="package-check" width="23" height="23"></i></div>
+    <div>
+      <h1>Portal de Entregas</h1>
+      <p>Agendamento de recebimento de mercadorias</p>
+    </div>
   </div>
+  <a class="admin-link" href="login.html" title="Area administrativa">
+    <i data-lucide="shield-check" width="18" height="18"></i>
+    <span>Area administrativa</span>
+  </a>
 </header>
 
 <main>
-  <div class="card" x-data="agendamento()" x-init="init()">
+  <section class="intro" aria-label="Resumo do portal">
+    <div class="eyebrow"><i data-lucide="calendar-clock" width="15" height="15"></i> Agendamento online</div>
+    <h2>Entregas organizadas, com horario confirmado.</h2>
+    <p>Informe os dados da nota, escolha uma data disponivel e envie os documentos para analise do recebimento.</p>
+    <div class="support-list">
+      <div class="support-item">
+        <span class="mini-icon"><i data-lucide="file-check-2" width="18" height="18"></i></span>
+        <span>XML e DANFE ficam vinculados ao pedido para aprovacao interna.</span>
+      </div>
+      <div class="support-item">
+        <span class="mini-icon"><i data-lucide="mail-check" width="18" height="18"></i></span>
+        <span>O retorno de aprovacao ou reprovacao sera enviado para o e-mail informado.</span>
+      </div>
+    </div>
+  </section>
 
+  <section class="card" x-data="agendamento()" x-init="init()">
     <div class="steps" x-show="!concluido">
       <div class="step" :class="{ active: etapa === 1, done: etapa > 1 }">
-        <div class="step-num" x-text="etapa > 1 ? '✓' : '1'"></div>
+        <div class="step-num" x-html="etapa > 1 ? '<i data-lucide=&quot;check&quot; width=&quot;15&quot; height=&quot;15&quot;></i>' : '1'"></div>
         <span>Dados</span>
       </div>
-
       <div class="step" :class="{ active: etapa === 2, done: etapa > 2 }">
-        <div class="step-num" x-text="etapa > 2 ? '✓' : '2'"></div>
-        <span>Data & Hora</span>
+        <div class="step-num" x-html="etapa > 2 ? '<i data-lucide=&quot;check&quot; width=&quot;15&quot; height=&quot;15&quot;></i>' : '2'"></div>
+        <span>Data e hora</span>
       </div>
-
       <div class="step" :class="{ active: etapa === 3 }">
         <div class="step-num">3</div>
         <span>Documentos</span>
       </div>
     </div>
 
-    <div class="alert" :class="alerta.tipo === 'erro' ? 'alert-error' : 'alert-success'"
-         x-show="alerta.msg" x-transition>
-      <span x-text="alerta.tipo === 'erro' ? '⚠️' : '✅'"></span>
+    <div class="alert" :class="alerta.tipo === 'erro' ? 'alert-error' : 'alert-success'" x-show="alerta.msg" x-transition>
+      <span x-html="alerta.tipo === 'erro' ? '<i data-lucide=&quot;circle-alert&quot; width=&quot;18&quot; height=&quot;18&quot;></i>' : '<i data-lucide=&quot;circle-check&quot; width=&quot;18&quot; height=&quot;18&quot;></i>'"></span>
       <span x-text="alerta.msg"></span>
     </div>
 
     <div x-show="etapa === 1 && !concluido" x-transition>
-      <div class="card-title">🏢 Dados do Fornecedor</div>
+      <div class="section-title"><i data-lucide="building-2" width="21" height="21"></i> Dados do fornecedor</div>
 
       <div class="form-group">
         <label>Fornecedor *</label>
-        <input type="text" x-model="form.fornecedor" placeholder="Razão social ou nome fantasia">
+        <input type="text" x-model="form.fornecedor" placeholder="Razao social ou nome fantasia">
       </div>
 
       <div class="grid-2">
@@ -326,7 +478,7 @@
           <input type="text" x-model="form.cnpj" @input="formatarCNPJ($event)" maxlength="18" placeholder="00.000.000/0000-00">
         </div>
         <div class="form-group">
-          <label>Nº da Nota *</label>
+          <label>No. da nota *</label>
           <input type="text" x-model="form.nota" placeholder="Ex: 001234">
         </div>
       </div>
@@ -336,154 +488,165 @@
         <input type="email" x-model="form.email" placeholder="email@fornecedor.com.br">
       </div>
 
-      <button class="btn-primary" @click="irParaEtapa2()">Próximo</button>
+      <button class="btn btn-primary" @click="irParaEtapa2()">
+        Proximo <i data-lucide="arrow-right" width="18" height="18"></i>
+      </button>
     </div>
 
     <div x-show="etapa === 2 && !concluido" x-transition>
-      <div class="card-title">📅 Data e Horário de Entrega</div>
+      <div class="section-title"><i data-lucide="calendar-days" width="21" height="21"></i> Data e horario de entrega</div>
 
       <div class="form-group">
-        <label>Data da Entrega *</label>
-        <input type="text" id="dataPicker" readonly placeholder="Selecione uma data...">
+        <label>Data da entrega *</label>
+        <input type="text" id="dataPicker" readonly placeholder="Selecione uma data">
       </div>
 
       <div class="form-group">
-        <label>Horário Disponível *</label>
-
-        <select x-show="!form.data || carregandoHorarios || horarios.length === 0" disabled style="color:var(--gray-400);">
-          <option x-text="carregandoHorarios ? '⏳ Carregando horários...' : (form.data ? '— Nenhum horário disponível —' : 'Selecione a data primeiro')"></option>
+        <label>Horario disponivel *</label>
+        <select x-show="!form.data || carregandoHorarios || horarios.length === 0" disabled>
+          <option x-text="carregandoHorarios ? 'Carregando horarios...' : (form.data ? 'Nenhum horario disponivel' : 'Selecione a data primeiro')"></option>
         </select>
 
         <select x-show="form.data && !carregandoHorarios && horarios.length > 0" x-model="form.horario">
-          <option value="">Selecione um horário</option>
-          <optgroup label="☀️ Manhã">
+          <option value="">Selecione um horario</option>
+          <optgroup label="Manha">
             <template x-for="h in horariosManha" :key="h">
               <option :value="h" x-text="h"></option>
             </template>
           </optgroup>
-          <optgroup label="🌤️ Tarde">
+          <optgroup label="Tarde">
             <template x-for="h in horariosTarde" :key="h">
               <option :value="h" x-text="h"></option>
             </template>
           </optgroup>
         </select>
 
-        <p style="font-size:.78rem;color:var(--gray-400);margin-top:6px;" x-show="form.data && !carregandoHorarios && horarios.length === 0">
-          ⚠️ Nenhum horário disponível nesta data. Escolha outra.
+        <p class="helper-text" x-show="form.data && !carregandoHorarios && horarios.length === 0">
+          <i data-lucide="info" width="15" height="15"></i> Nenhum horario disponivel nesta data. Escolha outra.
         </p>
       </div>
 
-      <div style="display:flex;gap:12px;margin-top:8px;">
-        <button class="btn-primary" style="background:var(--gray-200);color:var(--gray-600);" @click="etapa = 1">Voltar</button>
-        <button class="btn-primary" @click="irParaEtapa3()">Próximo</button>
+      <div class="btn-row">
+        <button class="btn btn-secondary" @click="etapa = 1"><i data-lucide="arrow-left" width="18" height="18"></i> Voltar</button>
+        <button class="btn btn-primary" @click="irParaEtapa3()">Proximo <i data-lucide="arrow-right" width="18" height="18"></i></button>
       </div>
     </div>
 
     <div x-show="etapa === 3 && !concluido" x-transition>
-      <div class="card-title">📎 Documentos da Nota</div>
+      <div class="section-title"><i data-lucide="paperclip" width="21" height="21"></i> Documentos da nota</div>
 
       <div class="form-group">
-        <label>XML da Nota Fiscal *</label>
+        <label>XML da nota fiscal *</label>
         <div class="upload-area" :class="{ 'tem-arquivo': form.xmlFile }">
           <input type="file" accept=".xml" @change="selecionarArquivo($event, 'xml')">
-          <div class="icon" x-text="form.xmlFile ? '✅' : '📄'"></div>
-          <div class="label-main" x-text="form.xmlFile ? form.xmlFile.name : 'Clique para selecionar o XML'"></div>
-          <div class="label-sub" x-text="form.xmlFile ? formatarTamanho(form.xmlFile.size) : 'Máximo 10 MB'"></div>
+          <div>
+            <div class="upload-icon" x-html="form.xmlFile ? '<i data-lucide=&quot;file-check-2&quot; width=&quot;28&quot; height=&quot;28&quot;></i>' : '<i data-lucide=&quot;file-up&quot; width=&quot;28&quot; height=&quot;28&quot;></i>'"></div>
+            <div class="label-main" x-text="form.xmlFile ? form.xmlFile.name : 'Clique para selecionar o XML'"></div>
+            <div class="label-sub" x-text="form.xmlFile ? formatarTamanho(form.xmlFile.size) : 'Maximo 10 MB'"></div>
+          </div>
         </div>
       </div>
 
       <div class="form-group">
-        <label>PDF da Nota Fiscal / DANFE *</label>
+        <label>PDF da nota fiscal / DANFE *</label>
         <div class="upload-area" :class="{ 'tem-arquivo': form.pdfFile }">
           <input type="file" accept=".pdf" @change="selecionarArquivo($event, 'pdf')">
-          <div class="icon" x-text="form.pdfFile ? '✅' : '🖨️'"></div>
-          <div class="label-main" x-text="form.pdfFile ? form.pdfFile.name : 'Clique para selecionar o PDF'"></div>
-          <div class="label-sub" x-text="form.pdfFile ? formatarTamanho(form.pdfFile.size) : 'Máximo 10 MB'"></div>
+          <div>
+            <div class="upload-icon" x-html="form.pdfFile ? '<i data-lucide=&quot;file-check-2&quot; width=&quot;28&quot; height=&quot;28&quot;></i>' : '<i data-lucide=&quot;file-up&quot; width=&quot;28&quot; height=&quot;28&quot;></i>'"></div>
+            <div class="label-main" x-text="form.pdfFile ? form.pdfFile.name : 'Clique para selecionar o PDF'"></div>
+            <div class="label-sub" x-text="form.pdfFile ? formatarTamanho(form.pdfFile.size) : 'Maximo 10 MB'"></div>
+          </div>
         </div>
       </div>
 
-      <div style="display:flex;gap:12px;margin-top:8px;">
-        <button class="btn-primary" style="background:var(--gray-200);color:var(--gray-600);" @click="etapa = 2">Voltar</button>
-        <button class="btn-primary" @click="salvar()" :disabled="salvando">
+      <div class="btn-row">
+        <button class="btn btn-secondary" @click="etapa = 2"><i data-lucide="arrow-left" width="18" height="18"></i> Voltar</button>
+        <button class="btn btn-primary" @click="salvar()" :disabled="salvando">
           <span class="spinner" x-show="salvando"></span>
-          <span x-text="salvando ? 'Enviando...' : 'Confirmar Agendamento'"></span>
+          <span x-text="salvando ? 'Enviando...' : 'Confirmar agendamento'"></span>
         </button>
       </div>
     </div>
 
     <div x-show="concluido" x-transition class="success-screen">
-      <span class="success-icon">🎉</span>
-      <h3>Solicitação enviada!</h3>
-      <p>Seu agendamento foi enviado para análise do setor de recebimento.</p>
-      <p style="margin-bottom: 8px;">Você receberá um retorno no e-mail informado após a aprovação ou reprovação.</p>
-      <p style="font-size: 0.85rem; color: #666; background-color: #f8fafc; padding: 8px 12px; border-left: 3px solid #b7770d; border-radius: 4px;">
-        💡 <strong>Dica:</strong> Verifique sua pasta de <strong>Spam/Lixo Eletrônico</strong>. Se o e-mail estiver lá, marque-o como <strong>"Não é spam"</strong> para garantir que as próximas notificações cheguem direto na sua Caixa de Entrada.
-      </p>
+      <div class="success-icon"><i data-lucide="party-popper" width="30" height="30"></i></div>
+      <h3>Solicitacao enviada</h3>
+      <p>Seu agendamento foi enviado para analise do setor de recebimento.</p>
+      <p>Voce recebera um retorno no e-mail informado apos a aprovacao ou reprovacao.</p>
+
+      <div class="notice">
+        <strong>Dica:</strong> verifique sua pasta de Spam/Lixo Eletronico. Se o e-mail estiver la, marque como "Nao e spam".
+      </div>
 
       <div class="success-detail">
         <dl>
           <dt>Fornecedor</dt><dd x-text="form.fornecedor"></dd>
           <dt>CNPJ</dt><dd x-text="form.cnpj"></dd>
           <dt>Data</dt><dd x-text="dataFormatadaDisplay()"></dd>
-          <dt>Horário</dt><dd x-text="form.horario"></dd>
-          <dt>Nota Fiscal</dt><dd x-text="form.nota"></dd>
+          <dt>Horario</dt><dd x-text="form.horario"></dd>
+          <dt>Nota fiscal</dt><dd x-text="form.nota"></dd>
         </dl>
       </div>
-      <button class="btn-novo" @click="reiniciar()">+ Novo Agendamento</button>
+      <button class="btn btn-outline" @click="reiniciar()"><i data-lucide="plus" width="18" height="18"></i> Novo agendamento</button>
     </div>
-
-  </div>
+  </section>
 </main>
 
-<footer>Portal de Agendamento de Entregas &nbsp;|&nbsp; Área de Recebimento</footer>
+<footer>Portal de Agendamento de Entregas | Area de Recebimento</footer>
 
 <script>
-// ============================================================
-// CONFIGURAÇÃO DA API DO GOOGLE APPS SCRIPT
-// ============================================================
 const URL_APPS_SCRIPT = "https://script.google.com/macros/s/AKfycbz5aXhKJlI44UZblriJLiK88JjxHK3aod7hnPJ5PsSsx9TrVkvADeahBz1xQzGeNoYi/exec";
+
+function renderIcons() {
+  if (window.lucide) setTimeout(() => lucide.createIcons(), 0);
+}
+
+document.addEventListener('alpine:init', () => {
+  Alpine.effect(() => renderIcons());
+});
 
 function agendamento() {
   return {
-    etapa  : 1,
+    etapa: 1,
     concluido: false,
-    salvando : false,
+    salvando: false,
     carregandoHorarios: false,
-    horarios : [],
+    horarios: [],
     horariosManha: [],
     horariosTarde: [],
-    alerta   : { msg: '', tipo: '' },
+    alerta: { msg: '', tipo: '' },
 
     form: {
       fornecedor: '',
-      cnpj      : '',
-      email     : '',
-      nota      : '',
-      data      : '',
-      horario   : '',
-      xmlFile   : null,
-      pdfFile   : null
+      cnpj: '',
+      email: '',
+      nota: '',
+      data: '',
+      horario: '',
+      xmlFile: null,
+      pdfFile: null
     },
 
     init() {
+      renderIcons();
       this.$nextTick(() => {
         flatpickr('#dataPicker', {
-          locale     : 'pt',
-          minDate    : 'today',
-          disable    : [d => d.getDay() === 0 || d.getDay() === 6],
-          dateFormat : 'Y-m-d',
-          altInput   : true,
-          altFormat  : 'd/m/Y',
-          onChange   : (selectedDates, dateStr) => {
-            this.form.data    = dateStr;
+          locale: 'pt',
+          minDate: 'today',
+          disable: [d => d.getDay() === 0 || d.getDay() === 6],
+          dateFormat: 'Y-m-d',
+          altInput: true,
+          altFormat: 'd/m/Y',
+          onChange: (selectedDates, dateStr) => {
+            this.form.data = dateStr;
             this.form.horario = '';
             this.carregarHorarios(dateStr);
           }
         });
+        renderIcons();
       });
     },
 
-    // Abstração central para comunicação assíncrona externa via POST
     async chamarAPI(action, paramData = {}) {
       const response = await fetch(URL_APPS_SCRIPT, {
         method: 'POST',
@@ -496,29 +659,32 @@ function agendamento() {
 
     mostrarAlerta(msg, tipo = 'erro') {
       this.alerta = { msg, tipo };
+      renderIcons();
       setTimeout(() => { this.alerta.msg = ''; }, 5000);
     },
 
     irParaEtapa2() {
       if (!this.form.fornecedor.trim()) return this.mostrarAlerta('Informe o nome do fornecedor.');
       const cnpjNum = this.form.cnpj.replace(/\D/g, '');
-      if (cnpjNum.length !== 14) return this.mostrarAlerta('CNPJ inválido. Digite os 14 dígitos.');
-      if (!this.form.nota.trim()) return this.mostrarAlerta('Informe o número da Nota Fiscal.');
+      if (cnpjNum.length !== 14) return this.mostrarAlerta('CNPJ invalido. Digite os 14 digitos.');
+      if (!this.form.nota.trim()) return this.mostrarAlerta('Informe o numero da Nota Fiscal.');
       if (!this.form.email.trim()) return this.mostrarAlerta('Informe o e-mail.');
       this.alerta.msg = '';
       this.etapa = 2;
+      renderIcons();
     },
 
     irParaEtapa3() {
       if (!this.form.data) return this.mostrarAlerta('Selecione uma data.');
-      if (!this.form.horario) return this.mostrarAlerta('Selecione um horário disponível.');
+      if (!this.form.horario) return this.mostrarAlerta('Selecione um horario disponivel.');
       this.alerta.msg = '';
       this.etapa = 3;
+      renderIcons();
     },
 
     carregarHorarios(data) {
       this.carregandoHorarios = true;
-      this.horarios      = [];
+      this.horarios = [];
       this.horariosManha = [];
       this.horariosTarde = [];
 
@@ -528,10 +694,11 @@ function agendamento() {
           this.horariosManha = this.horarios.filter(h => parseInt(h.split(':')[0]) < 12);
           this.horariosTarde = this.horarios.filter(h => parseInt(h.split(':')[0]) >= 12);
           this.carregandoHorarios = false;
+          renderIcons();
         })
         .catch(() => {
           this.carregandoHorarios = false;
-          this.mostrarAlerta('Erro ao carregar horários. Tente novamente.');
+          this.mostrarAlerta('Erro ao carregar horarios. Tente novamente.');
         });
     },
 
@@ -539,12 +706,13 @@ function agendamento() {
       const file = event.target.files[0];
       if (!file) return;
       if (file.size > 10 * 1024 * 1024) {
-        this.mostrarAlerta(`O arquivo ${tipo.toUpperCase()} deve ter no máximo 10 MB.`);
+        this.mostrarAlerta(`O arquivo ${tipo.toUpperCase()} deve ter no maximo 10 MB.`);
         event.target.value = '';
         return;
       }
       if (tipo === 'xml') this.form.xmlFile = file;
       if (tipo === 'pdf') this.form.pdfFile = file;
+      renderIcons();
     },
 
     formatarTamanho(bytes) {
@@ -582,16 +750,16 @@ function agendamento() {
         ]);
 
         const dadosPayload = {
-          fornecedor  : this.form.fornecedor.trim(),
-          cnpj        : this.form.cnpj.trim(),
-          email       : this.form.email.trim(),
-          nota        : this.form.nota.trim(),
-          data        : this.form.data,
-          horario     : this.form.horario,
-          xmlNome     : this.form.xmlFile.name,
-          xmlConteudo : xmlBase64,
-          pdfNome     : this.form.pdfFile.name,
-          pdfConteudo : pdfBase64
+          fornecedor: this.form.fornecedor.trim(),
+          cnpj: this.form.cnpj.trim(),
+          email: this.form.email.trim(),
+          nota: this.form.nota.trim(),
+          data: this.form.data,
+          horario: this.form.horario,
+          xmlNome: this.form.xmlFile.name,
+          xmlConteudo: xmlBase64,
+          pdfNome: this.form.pdfFile.name,
+          pdfConteudo: pdfBase64
         };
 
         this.chamarAPI('salvarAgendamento', dadosPayload)
@@ -599,6 +767,7 @@ function agendamento() {
             this.salvando = false;
             if (res.ok) {
               this.concluido = true;
+              renderIcons();
             } else {
               this.mostrarAlerta(res.msg);
             }
@@ -607,7 +776,6 @@ function agendamento() {
             this.salvando = false;
             this.mostrarAlerta('Erro ao comunicar com o servidor. Tente novamente.');
           });
-
       } catch (e) {
         this.salvando = false;
         this.mostrarAlerta('Erro ao processar os arquivos. Verifique e tente novamente.');
@@ -617,7 +785,7 @@ function agendamento() {
     fileToBase64(file) {
       return new Promise((resolve, reject) => {
         const reader = new FileReader();
-        reader.onload  = e => resolve(e.target.result.split(',')[1]);
+        reader.onload = e => resolve(e.target.result.split(',')[1]);
         reader.onerror = reject;
         reader.readAsDataURL(file);
       });
@@ -628,15 +796,17 @@ function agendamento() {
         fornecedor: '', cnpj: '', email: '', nota: '',
         data: '', horario: '', xmlFile: null, pdfFile: null
       };
-      this.horarios      = [];
+      this.horarios = [];
       this.horariosManha = [];
       this.horariosTarde = [];
       this.concluido = false;
-      this.etapa     = 1;
+      this.etapa = 1;
       this.alerta.msg = '';
 
-      const fp = document.querySelector('#dataPicker')._flatpickr;
+      const picker = document.querySelector('#dataPicker');
+      const fp = picker && picker._flatpickr;
       if (fp) fp.clear();
+      renderIcons();
     }
   };
 }
