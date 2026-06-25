@@ -420,7 +420,7 @@
       <p>Agendamento de recebimento de mercadorias</p>
     </div>
   </div>
-  <a class="admin-link" href="login.html" title="Area administrativa">
+  <a class="admin-link" href="login.html" onclick="abrirLoginAdmin(event)" title="Area administrativa">
     <i data-lucide="shield-check" width="18" height="18"></i>
     <span>Area administrativa</span>
   </a>
@@ -596,6 +596,14 @@
 
 <script>
 const URL_APPS_SCRIPT = "https://script.google.com/macros/s/AKfycbz5aXhKJlI44UZblriJLiK88JjxHK3aod7hnPJ5PsSsx9TrVkvADeahBz1xQzGeNoYi/exec";
+
+function abrirLoginAdmin(event) {
+  const urlAtual = window.location.href.split('?')[0];
+  if (urlAtual.toLowerCase().endsWith('index.html')) return;
+
+  event.preventDefault();
+  window.location.href = urlAtual + '?page=login';
+}
 
 function renderIcons() {
   if (window.lucide) setTimeout(() => lucide.createIcons(), 0);

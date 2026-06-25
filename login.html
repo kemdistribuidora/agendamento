@@ -315,6 +315,8 @@
 </main>
 
 <script>
+const URL_APPS_SCRIPT = "https://script.google.com/macros/s/AKfycbz5aXhKJlI44UZblriJLiK88JjxHK3aod7hnPJ5PsSsx9TrVkvADeahBz1xQzGeNoYi/exec";
+
 function renderIcons() {
   if (window.lucide) setTimeout(() => lucide.createIcons(), 0);
 }
@@ -335,6 +337,25 @@ function login() {
       renderIcons();
     },
 
+    async chamarAPI(action, paramData = {}) {
+      const response = await fetch(URL_APPS_SCRIPT, {
+        method: 'POST',
+        mode: 'cors',
+        headers: { 'Content-Type': 'text/plain' },
+        body: JSON.stringify({ action: action, data: paramData })
+      });
+      return await response.json();
+    },
+
+    irParaAdmin() {
+      const urlAtual = window.location.href.split('?')[0];
+      if (urlAtual.toLowerCase().endsWith('login.html')) {
+        window.location.href = urlAtual.replace(/login\.html$/i, 'admin.html');
+        return;
+      }
+      window.location.href = urlAtual + '?page=admin';
+    },
+
     entrar() {
       if (!this.usuario.trim()) { this.erro = 'Informe o usuario.'; renderIcons(); return; }
       if (!this.senha.trim()) { this.erro = 'Informe a senha.'; renderIcons(); return; }
@@ -343,23 +364,24 @@ function login() {
       this.carregando = true;
       renderIcons();
 
-      google.script.run
-        .withSuccessHandler(res => {
+      this.chamarAPI('loginAdmin', {
+        usuario: this.usuario,
+        senha: this.senha
+      })
+        .then(res => {
           this.carregando = false;
           if (res && res.ok) {
-            const url = window.location.href.split('?')[0];
-            window.location.href = url + '?page=admin';
+            this.irParaAdmin();
           } else {
-            this.erro = 'Usuario ou senha invalidos.';
+            this.erro = res?.msg || 'Usuario ou senha invalidos.';
           }
           renderIcons();
         })
-        .withFailureHandler(() => {
+        .catch(() => {
           this.carregando = false;
           this.erro = 'Erro ao conectar. Tente novamente.';
           renderIcons();
-        })
-        .loginAdmin(this.usuario, this.senha);
+        });
     }
   };
 }

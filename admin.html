@@ -455,7 +455,7 @@
         <i data-lucide="database" width="16" height="16"></i>
         <span x-text="agendamentos.length + ' registros'"></span>
       </span>
-      <button class="btn btn-ghost" onclick="window.location.href='index.html'">
+      <button class="btn btn-ghost" onclick="sairPainel()">
         <i data-lucide="log-out" width="17" height="17"></i> Sair
       </button>
     </div>
@@ -654,6 +654,15 @@
 
 <script>
 const URL_AP_SCRIPT = "https://script.google.com/macros/s/AKfycbz5aXhKJlI44UZblriJLiK88JjxHK3aod7hnPJ5PsSsx9TrVkvADeahBz1xQzGeNoYi/exec";
+
+function sairPainel() {
+  const urlAtual = window.location.href.split('?')[0];
+  if (urlAtual.toLowerCase().endsWith('admin.html')) {
+    window.location.href = urlAtual.replace(/admin\.html$/i, 'index.html');
+    return;
+  }
+  window.location.href = urlAtual;
+}
 
 function renderIcons() {
   if (window.lucide) setTimeout(() => lucide.createIcons(), 0);

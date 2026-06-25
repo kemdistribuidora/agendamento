@@ -4,6 +4,25 @@
 const PASTA_XML   = '1KM8ZtkcrIKCOu8KzegcWaYql9JhURpzs';
 const PASTA_PDF   = '1Y_MxaM3px3q3o045LtYFSbA9loBE8xgv';
 const ID_PLANILHA = '1hk97-eBX2iq3SR-LJ4RsDXaN50fhMpbVY1anglzbmvk';
+const CREDENCIAIS_ADMIN = {
+  admin: '123456',
+  recebimento: '123456'
+};
+
+// ============================================================
+//   FRONTEND (METODO GET) - usado no deploy do Apps Script
+// ============================================================
+function doGet(e) {
+  var page = (e && e.parameter && e.parameter.page) ? String(e.parameter.page) : 'index';
+  var arquivo = 'index';
+
+  if (page === 'login') arquivo = 'login';
+  if (page === 'admin') arquivo = 'admin';
+
+  return HtmlService.createHtmlOutputFromFile(arquivo)
+                    .setTitle('Agendamento de Entregas')
+                    .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
+}
 
 // ============================================================
 //   ENDPOINT API (MÉTODO POST) — ESSENCIAL PARA O VS CODE
@@ -47,6 +66,10 @@ function doPost(e) {
         
       case 'reprovarAgendamento':
         response = reprovarAgendamento(params.id);
+        break;
+
+      case 'loginAdmin':
+        response = loginAdmin(params.usuario, params.senha);
         break;
         
       default:
@@ -103,6 +126,16 @@ function autorizarSistema() {
   DriveApp.getFolderById(PASTA_XML).getName();
   DriveApp.getFolderById(PASTA_PDF).getName();
   return true;
+}
+
+function loginAdmin(usuario, senha) {
+  var usuarioInformado = String(usuario || '').trim();
+  var senhaInformada = String(senha || '').trim();
+
+  return {
+    ok: CREDENCIAIS_ADMIN[usuarioInformado] === senhaInformada,
+    usuario: usuarioInformado
+  };
 }
 
 function getPlanilha() {
