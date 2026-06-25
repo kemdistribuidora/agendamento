@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <base target="_top">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Acesso Administrativo</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --brand    : #1B5E91;
+      --brand-lt : #2980B9;
+      --brand-dk : #0D3B5E;
+      --danger   : #922B21;
+      --danger-bg: #FADBD8;
+      --gray-100 : #F1F5F9;
+      --gray-200 : #E2E8F0;
+      --gray-400 : #94A3B8;
+      --gray-600 : #475569;
+      --gray-800 : #1E293B;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(135deg, var(--brand-dk) 0%, var(--brand) 50%, var(--brand-lt) 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .wrapper {
+      width: 100%;
+      max-width: 400px;
+    }
+
+    .brand {
+      text-align: center;
+      margin-bottom: 32px;
+    }
+    .brand-icon {
+      width: 60px; height: 60px;
+      background: rgba(255,255,255,.2);
+      border-radius: 16px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 28px;
+      margin: 0 auto 12px;
+      backdrop-filter: blur(8px);
+    }
+    .brand h2 { color: #fff; font-size: 1.25rem; font-weight: 700; }
+    .brand p  { color: rgba(255,255,255,.7); font-size: .85rem; margin-top: 4px; }
+
+    .card {
+      background: #fff;
+      border-radius: 16px;
+      padding: 32px;
+      box-shadow: 0 24px 48px rgba(0,0,0,.25);
+    }
+
+    .card-title {
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: var(--gray-800);
+      margin-bottom: 24px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid var(--gray-200);
+    }
+
+    .form-group { margin-bottom: 18px; }
+
+    label {
+      display: block;
+      font-size: .8rem;
+      font-weight: 600;
+      color: var(--gray-600);
+      margin-bottom: 6px;
+      text-transform: uppercase;
+      letter-spacing: .04em;
+    }
+
+    .input-wrap { position: relative; }
+
+    .input-icon {
+      position: absolute;
+      left: 12px; top: 50%;
+      transform: translateY(-50%);
+      font-size: 15px;
+      pointer-events: none;
+    }
+
+    input {
+      width: 100%;
+      padding: 11px 14px 11px 38px;
+      border: 1.5px solid var(--gray-200);
+      border-radius: 8px;
+      font-family: 'Inter', sans-serif;
+      font-size: .92rem;
+      color: var(--gray-800);
+      background: var(--gray-100);
+      outline: none;
+      transition: border-color .2s, box-shadow .2s, background .2s;
+    }
+    input:focus {
+      border-color: var(--brand-lt);
+      box-shadow: 0 0 0 3px rgba(41,128,185,.15);
+      background: #fff;
+    }
+    input::placeholder { color: var(--gray-400); }
+
+    .toggle-senha {
+      position: absolute;
+      right: 12px; top: 50%;
+      transform: translateY(-50%);
+      background: none; border: none;
+      cursor: pointer; font-size: 15px; padding: 0;
+      color: var(--gray-400);
+    }
+
+    .alert-error {
+      background: var(--danger-bg);
+      color: var(--danger);
+      padding: 11px 14px;
+      border-radius: 8px;
+      font-size: .88rem;
+      font-weight: 500;
+      margin-bottom: 18px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .btn-primary {
+      width: 100%;
+      padding: 13px;
+      background: var(--brand);
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-family: 'Inter', sans-serif;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: background .2s;
+      margin-top: 6px;
+    }
+    .btn-primary:hover:not(:disabled) { background: var(--brand-lt); }
+    .btn-primary:disabled { opacity: .6; cursor: not-allowed; }
+
+    .spinner {
+      width: 17px; height: 17px;
+      border: 2.5px solid rgba(255,255,255,.35);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin .7s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .back-link {
+      display: block;
+      text-align: center;
+      margin-top: 20px;
+      color: rgba(255,255,255,.75);
+      font-size: .84rem;
+      text-decoration: none;
+    }
+    .back-link:hover { color: #fff; }
+  </style>
+</head>
+<body>
+
+<div class="wrapper" x-data="login()">
+
+  <div class="brand">
+    <div class="brand-icon">🔐</div>
+    <h2>Área Administrativa</h2>
+    <p>Portal de Agendamento de Entregas</p>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Acesso Restrito</div>
+
+    <!-- Erro -->
+    <div class="alert-error" x-show="erro" x-transition>
+      <span>⚠️</span>
+      <span x-text="erro"></span>
+    </div>
+
+    <!-- Usuário -->
+    <div class="form-group">
+      <label>Usuário</label>
+      <div class="input-wrap">
+        <span class="input-icon">👤</span>
+        <input type="text" x-model="usuario"
+               placeholder="Digite o usuário"
+               @keydown.enter="entrar()">
+      </div>
+    </div>
+
+    <!-- Senha -->
+    <div class="form-group">
+      <label>Senha</label>
+      <div class="input-wrap">
+        <span class="input-icon">🔑</span>
+        <input :type="mostrarSenha ? 'text' : 'password'"
+               x-model="senha"
+               placeholder="Digite a senha"
+               @keydown.enter="entrar()">
+        <button class="toggle-senha" @click="mostrarSenha = !mostrarSenha"
+                type="button" :title="mostrarSenha ? 'Ocultar' : 'Mostrar'">
+          <span x-text="mostrarSenha ? '🙈' : '👁️'"></span>
+        </button>
+      </div>
+    </div>
+
+    <button class="btn-primary" @click="entrar()" :disabled="carregando">
+      <span class="spinner" x-show="carregando"></span>
+      <span x-text="carregando ? 'Verificando...' : 'Entrar'"></span>
+    </button>
+  </div>
+
+  <a href="javascript:history.back()" class="back-link">← Voltar ao portal</a>
+</div>
+
+<script>
+function login() {
+  return {
+    usuario    : '',
+    senha      : '',
+    erro       : '',
+    carregando : false,
+    mostrarSenha: false,
+
+    entrar() {
+      if (!this.usuario.trim()) { this.erro = 'Informe o usuário.'; return; }
+      if (!this.senha.trim())   { this.erro = 'Informe a senha.';   return; }
+
+      this.erro      = '';
+      this.carregando = true;
+
+      google.script.run
+        .withSuccessHandler(res => {
+          this.carregando = false;
+          if (res && res.ok) {
+            // Redireciona para o painel admin via URL param
+            const url = window.location.href.split('?')[0];
+            window.location.href = url + '?page=admin';
+          } else {
+            this.erro = 'Usuário ou senha inválidos.';
+          }
+        })
+        .withFailureHandler(() => {
+          this.carregando = false;
+          this.erro = 'Erro ao conectar. Tente novamente.';
+        })
+        .loginAdmin(this.usuario, this.senha);
+    }
+  };
+}
+</script>
+</body>
+</html>

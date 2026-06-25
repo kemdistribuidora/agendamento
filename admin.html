@@ -1,0 +1,689 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <base target="_top">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Painel Admin — Agendamentos</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --brand     : #1B5E91;
+      --brand-lt  : #2980B9;
+      --brand-bg  : #EBF4FB;
+      --success   : #1A7A4A;
+      --success-bg: #D4EDDA;
+      --danger    : #922B21;
+      --danger-bg : #FADBD8;
+      --warn      : #B7770D;
+      --warn-bg   : #FEF3CD;
+      --gray-50   : #F8FAFC;
+      --gray-100  : #F1F5F9;
+      --gray-200  : #E2E8F0;
+      --gray-400  : #94A3B8;
+      --gray-600  : #475569;
+      --gray-800  : #1E293B;
+      --shadow    : 0 2px 12px rgba(0,0,0,.08);
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--gray-100);
+      min-height: 100vh;
+    }
+
+    /* ── Header ── */
+    header {
+      background: var(--brand);
+      color: #fff;
+      padding: 0 24px;
+      height: 56px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: 0 2px 8px rgba(0,0,0,.2);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .header-left { display: flex; align-items: center; gap: 10px; }
+    .header-icon {
+      width: 32px; height: 32px;
+      background: rgba(255,255,255,.2);
+      border-radius: 7px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 16px;
+    }
+    header h1 { font-size: 1rem; font-weight: 700; }
+    .header-badge {
+      background: rgba(255,255,255,.2);
+      border-radius: 20px;
+      padding: 3px 10px;
+      font-size: .75rem;
+      font-weight: 600;
+    }
+    .btn-sair {
+      background: rgba(255,255,255,.15);
+      border: 1px solid rgba(255,255,255,.3);
+      color: #fff;
+      border-radius: 6px;
+      padding: 6px 14px;
+      font-family: 'Inter', sans-serif;
+      font-size: .82rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background .2s;
+    }
+    .btn-sair:hover { background: rgba(255,255,255,.25); }
+
+    /* ── Layout ── */
+    main { padding: 24px; max-width: 1400px; margin: 0 auto; }
+
+    /* ── Cards de estatísticas ── */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+    .stat-card {
+      background: #fff;
+      border-radius: 10px;
+      padding: 18px 20px;
+      box-shadow: var(--shadow);
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+    .stat-icon {
+      width: 44px; height: 44px;
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 20px;
+      flex-shrink: 0;
+    }
+    .stat-icon.blue   { background: var(--brand-bg); }
+    .stat-icon.green  { background: var(--success-bg); }
+    .stat-icon.red    { background: var(--danger-bg); }
+    .stat-icon.yellow { background: var(--warn-bg); }
+    .stat-label { font-size: .75rem; color: var(--gray-400); font-weight: 600; text-transform: uppercase; letter-spacing: .04em; }
+    .stat-value { font-size: 1.6rem; font-weight: 700; color: var(--gray-800); line-height: 1.1; }
+
+    /* ── Painel principal ── */
+    .panel {
+      background: #fff;
+      border-radius: 10px;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    /* ── Toolbar ── */
+    .toolbar {
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--gray-200);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .toolbar-title { font-weight: 700; font-size: 1rem; color: var(--gray-800); margin-right: auto; }
+
+    .input-search {
+      padding: 8px 12px;
+      border: 1.5px solid var(--gray-200);
+      border-radius: 7px;
+      font-family: 'Inter', sans-serif;
+      font-size: .85rem;
+      color: var(--gray-800);
+      background: var(--gray-50);
+      outline: none;
+      width: 220px;
+      transition: border-color .2s;
+    }
+    .input-search:focus { border-color: var(--brand-lt); background: #fff; }
+
+    .select-filtro {
+      padding: 8px 12px;
+      border: 1.5px solid var(--gray-200);
+      border-radius: 7px;
+      font-family: 'Inter', sans-serif;
+      font-size: .85rem;
+      color: var(--gray-800);
+      background: var(--gray-50);
+      outline: none;
+      cursor: pointer;
+    }
+
+    .btn {
+      padding: 8px 16px;
+      border: none;
+      border-radius: 7px;
+      font-family: 'Inter', sans-serif;
+      font-size: .85rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: opacity .2s;
+      white-space: nowrap;
+    }
+    .btn:hover { opacity: .85; }
+    .btn:disabled { opacity: .55; cursor: not-allowed; }
+    .btn-primary { background: var(--brand); color: #fff; }
+    .btn-success { background: var(--success); color: #fff; }
+    .btn-danger  { background: var(--danger); color: #fff; }
+    .btn-ghost   { background: var(--gray-100); color: var(--gray-600); border: 1px solid var(--gray-200); }
+
+    /* ── Tabela ── */
+    .table-wrap { overflow-x: auto; }
+
+    table { width: 100%; border-collapse: collapse; font-size: .875rem; }
+
+    thead th {
+      background: var(--gray-50);
+      color: var(--gray-600);
+      font-weight: 600;
+      font-size: .75rem;
+      text-transform: uppercase;
+      letter-spacing: .05em;
+      padding: 11px 16px;
+      text-align: left;
+      border-bottom: 2px solid var(--gray-200);
+      white-space: nowrap;
+    }
+
+    tbody td {
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--gray-100);
+      color: var(--gray-800);
+      vertical-align: middle;
+    }
+
+    tbody tr:last-child td { border-bottom: none; }
+    tbody tr:hover { background: var(--gray-50); }
+
+    .td-data    { font-weight: 600; white-space: nowrap; }
+    .td-hora    { font-weight: 700; color: var(--brand); white-space: nowrap; }
+    .td-fornecedor { font-weight: 500; }
+    .td-cnpj    { font-family: monospace; font-size: .82rem; color: var(--gray-600); }
+
+    .link-doc {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 4px 10px;
+      border-radius: 5px;
+      font-size: .78rem;
+      font-weight: 600;
+      text-decoration: none;
+      transition: opacity .2s;
+    }
+    .link-doc:hover { opacity: .8; }
+    .link-xml { background: #FFF3E0; color: #E65100; }
+    .link-pdf { background: #FCE4EC; color: #C62828; }
+
+    /* Badges */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 3px 10px;
+      border-radius: 20px;
+      font-size: .75rem;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+    .badge-pendente  { background: var(--warn-bg);    color: var(--warn); }
+    .badge-cancelado { background: var(--danger-bg);  color: var(--danger); }
+    .badge-aprovado  { background: var(--success-bg); color: var(--success); }
+    .badge-reprovado { background: var(--danger-bg);  color: var(--danger); }
+
+    /* Acões agrupadas */
+    .acoes { display: flex; gap: 6px; flex-wrap: wrap; }
+
+    /* Spinner */
+    .spinner {
+      width: 16px; height: 16px;
+      border: 2.5px solid rgba(255,255,255,.3);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin .7s linear infinite;
+      display: inline-block;
+    }
+    .spinner-dark {
+      border-color: var(--gray-200);
+      border-top-color: var(--brand);
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* Loading / Empty */
+    .loading-row td, .empty-row td {
+      text-align: center;
+      padding: 48px;
+      color: var(--gray-400);
+    }
+    .empty-state { text-align: center; padding: 56px 24px; color: var(--gray-400); }
+    .empty-state .icon { font-size: 40px; margin-bottom: 12px; display: block; }
+    .empty-state p { font-size: .9rem; }
+
+    /* Modal de confirmação */
+    .modal-overlay {
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,.45);
+      display: flex; align-items: center; justify-content: center;
+      z-index: 200;
+      backdrop-filter: blur(3px);
+    }
+    .modal {
+      background: #fff;
+      border-radius: 12px;
+      padding: 28px;
+      width: 100%;
+      max-width: 380px;
+      box-shadow: 0 20px 60px rgba(0,0,0,.25);
+    }
+    .modal h3 { font-size: 1.05rem; margin-bottom: 8px; }
+    .modal p  { font-size: .9rem; color: var(--gray-600); margin-bottom: 20px; }
+    .modal-actions { display: flex; gap: 10px; justify-content: flex-end; }
+
+    /* Toast */
+    .toast {
+      position: fixed;
+      bottom: 24px; right: 24px;
+      padding: 12px 18px;
+      border-radius: 8px;
+      font-size: .88rem;
+      font-weight: 600;
+      color: #fff;
+      z-index: 300;
+      box-shadow: 0 8px 24px rgba(0,0,0,.2);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .toast-success { background: var(--success); }
+    .toast-error   { background: var(--danger); }
+
+    @media (max-width: 900px) {
+      .stats-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 600px) {
+      main { padding: 16px; }
+      .stats-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+      .toolbar { flex-direction: column; align-items: stretch; }
+      .input-search { width: 100%; }
+      .toolbar-title { margin-right: 0; }
+    }
+  </style>
+</head>
+<body x-data="painel()" x-init="init()">
+
+  <header>
+    <div class="header-left">
+      <div class="header-icon">📋</div>
+      <h1>Painel de Agendamentos</h1>
+      <span class="header-badge" x-text="agendamentos.length + ' registros'"></span>
+    </div>
+    <button class="btn-sair" onclick="window.location.href='index.html'">⬅ Sair</button>
+  </header>
+
+  <main>
+
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-icon blue">📦</div>
+        <div>
+          <div class="stat-label">Total Agendados</div>
+          <div class="stat-value" x-text="stats.agendados ?? '—'"></div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon green">📅</div>
+        <div>
+          <div class="stat-label">Hoje</div>
+          <div class="stat-value" x-text="stats.hoje ?? '—'"></div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon yellow">🗓️</div>
+        <div>
+          <div class="stat-label">Esta Semana</div>
+          <div class="stat-value" x-text="stats.semana ?? '—'"></div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon red">❌</div>
+        <div>
+          <div class="stat-label">Cancelados</div>
+          <div class="stat-value" x-text="stats.cancelados ?? '—'"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel">
+
+      <div class="toolbar">
+        <span class="toolbar-title">Agendamentos</span>
+
+        <input class="input-search" type="text"
+               placeholder="🔍 Buscar fornecedor ou CNPJ..."
+               x-model="filtros.busca"
+               @input.debounce.400ms="aplicarFiltros()">
+
+        <input class="input-search" type="date" style="width:160px;"
+               x-model="filtros.data"
+               @change="aplicarFiltros()">
+
+        <select class="select-filtro" x-model="filtros.status" @change="aplicarFiltros()">
+          <option value="">Todos os status</option>
+          <option value="PENDENTE">Pendente</option>
+          <option value="CANCELADO">Cancelado</option>
+        </select>
+
+        <button class="btn btn-ghost" @click="limparFiltros()">Limpar</button>
+
+        <button class="btn btn-primary" @click="carregar()" :disabled="carregando">
+          <span class="spinner" x-show="carregando" style="border-top-color:#fff;"></span>
+          <span x-text="carregando ? 'Atualizando...' : '↻ Atualizar'"></span>
+        </button>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Data</th>
+              <th>Hora</th>
+              <th>Fornecedor</th>
+              <th>CNPJ</th>
+              <th>Email</th>
+              <th>Documentos</th>
+              <th>Status</th>
+              <th>Aprovação</th>
+              <th>Criado em</th>
+              <th>Ações</th>
+            </tr>
+          </thead>
+          <tbody>
+
+            <tr class="loading-row" x-show="carregando">
+              <td colspan="10">
+                <span class="spinner spinner-dark"></span>
+                &nbsp; Carregando agendamentos...
+              </td>
+            </tr>
+
+            <tr class="empty-row" x-show="!carregando && filtrados.length === 0">
+              <td colspan="10">
+                <div class="empty-state">
+                  <span class="icon">📭</span>
+                  <p x-text="agendamentos.length === 0
+                    ? 'Nenhum agendamento encontrado.'
+                    : 'Nenhum resultado para os filtros aplicados.'">
+                  </p>
+                </div>
+              </td>
+            </tr>
+
+            <template x-for="row in filtrados" :key="row.id">
+              <tr>
+                <td class="td-data"      x-text="row.dataFormatada"></td>
+                <td class="td-hora"      x-text="row.horario"></td>
+                <td class="td-fornecedor" x-text="row.fornecedor"></td>
+                <td class="td-cnpj"      x-text="row.cnpj"></td>
+                <td style="font-size:.82rem;" x-text="row.email"></td>
+
+                <td>
+                  <div style="display:flex;gap:6px;flex-wrap:wrap;">
+                    <a class="link-doc link-xml" :href="row.urlXml" target="_blank"
+                       x-show="row.urlXml">📄 XML</a>
+                    <a class="link-doc link-pdf" :href="row.urlPdf" target="_blank"
+                       x-show="row.urlPdf">🖨️ PDF</a>
+                  </div>
+                </td>
+
+                <td>
+                  <span class="badge badge-pendente"  x-show="row.status === 'PENDENTE'">⏳ Pendente</span>
+                  <span class="badge badge-cancelado" x-show="row.status === 'CANCELADO'">✕ Cancelado</span>
+                </td>
+
+                <td>
+                  <span class="badge badge-pendente"  x-show="row.aprovacao === 'PENDENTE'">⏳ Pendente</span>
+                  <span class="badge badge-aprovado"  x-show="row.aprovacao === 'APROVADO'">✓ Aprovado</span>
+                  <span class="badge badge-reprovado" x-show="row.aprovacao === 'REPROVADO'">✕ Reprovado</span>
+                </td>
+
+                <td style="font-size:.8rem;color:var(--gray-400);white-space:nowrap;" x-text="row.criadoEm"></td>
+
+                <td>
+                  <div class="acoes">
+                    <button class="btn btn-danger" style="font-size:.78rem;padding:5px 10px;"
+                            x-show="row.status === 'PENDENTE'"
+                            @click="confirmarCancelamento(row)">
+                      Cancelar
+                    </button>
+
+                    <template x-if="row.status === 'PENDENTE' && row.aprovacao === 'PENDENTE'">
+                      <div class="acoes">
+                        <button class="btn btn-success" style="font-size:.78rem;padding:5px 10px;"
+                                @click="aprovar(row.id)">
+                          ✓ Aprovar
+                        </button>
+                        <button class="btn btn-danger" style="font-size:.78rem;padding:5px 10px;"
+                                @click="reprovar(row.id)">
+                          ✕ Reprovar
+                        </button>
+                      </div>
+                    </template>
+
+                    <span style="color:var(--gray-400);font-size:.8rem;"
+                          x-show="row.status === 'CANCELADO'">—</span>
+                  </div>
+                </td>
+              </tr>
+            </template>
+
+          </tbody>
+        </table>
+      </div>
+
+    </div></main>
+
+  <div class="modal-overlay" x-show="modal.aberto" x-transition style="display:none;">
+    <div class="modal" @click.stop>
+      <h3>⚠️ Cancelar agendamento?</h3>
+      <p>
+        Deseja cancelar o agendamento de
+        <strong x-text="modal.row?.fornecedor"></strong>
+        para <strong x-text="modal.row?.dataFormatada"></strong>
+        as <strong x-text="modal.row?.horario"></strong>?
+      </p>
+      <div class="modal-actions">
+        <button class="btn btn-ghost" @click="modal.aberto = false">Voltar</button>
+        <button class="btn btn-danger" @click="executarCancelamento()" :disabled="modal.cancelando">
+          <span class="spinner" x-show="modal.cancelando"></span>
+          <span x-text="modal.cancelando ? 'Cancelando...' : 'Confirmar cancelamento'"></span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast"
+       :class="toast.tipo === 'sucesso' ? 'toast-success' : 'toast-error'"
+       x-show="toast.msg" x-transition style="display:none;"
+       x-text="toast.msg">
+  </div>
+
+<script>
+// ============================================================
+// CONFIGURAÇÃO DA API DO GOOGLE APPS SCRIPT
+// ============================================================
+const URL_AP_SCRIPT = "https://script.google.com/macros/s/AKfycbz5aXhKJlI44UZblriJLiK88JjxHK3aod7hnPJ5PsSsx9TrVkvADeahBz1xQzGeNoYi/exec";
+
+function painel() {
+  return {
+    carregando   : false,
+    agendamentos : [],
+    filtrados    : [],
+    stats        : {},
+
+    filtros: {
+      busca : '',
+      data  : '',
+      status: ''
+    },
+
+    modal: {
+      aberto    : false,
+      row       : null,
+      cancelando: false
+    },
+
+    toast: {
+      msg : '',
+      tipo: ''
+    },
+
+    init() {
+      this.carregar();
+    },
+
+    // Centralizador de requisições Fetch para simplificar chamadas à API externa
+    async chamarAPI(action, paramData = {}) {
+      try {
+        const response = await fetch(URL_AP_SCRIPT, {
+          method: 'POST',
+          mode: 'cors',
+          headers: { 'Content-Type': 'text/plain' }, // Evita preflight complexo do CORS no Apps Script
+          body: JSON.stringify({ action: action, data: paramData })
+        });
+        return await response.json();
+      } catch (error) {
+        console.error(`Erro na action ${action}:`, error);
+        throw error;
+      }
+    },
+
+    async carregar() {
+      this.carregando = true;
+
+      // Buscar Estatísticas
+      this.chamarAPI('obterEstatisticas')
+        .then(s => { this.stats = s || {}; })
+        .catch(err => { console.error('stats error', err); });
+
+      // Buscar Lista de Agendamentos
+      this.chamarAPI('listarAgendamentos', {})
+        .then(lista => {
+          this.carregando  = false;
+          this.agendamentos = Array.isArray(lista) ? lista : [];
+          this.aplicarFiltros();
+        })
+        .catch(err => {
+          this.carregando = false;
+          this.mostrarToast('Erro ao carregar agendamentos.', 'erro');
+        });
+    },
+
+    aplicarFiltros() {
+      const { busca, data, status } = this.filtros;
+
+      this.filtrados = this.agendamentos.filter(row => {
+        if (status && row.status !== status) return false;
+        if (data && row.data !== data) return false;
+
+        if (busca) {
+          const b = busca.toLowerCase();
+          const fornecedor = (row.fornecedor || '').toLowerCase();
+          const cnpj       = (row.cnpj || '').toLowerCase();
+          if (!fornecedor.includes(b) && !cnpj.includes(b)) return false;
+        }
+        return true;
+      });
+    },
+
+    limparFiltros() {
+      this.filtros   = { busca: '', data: '', status: '' };
+      this.filtrados = [...this.agendamentos];
+    },
+
+    confirmarCancelamento(row) {
+      this.modal = { aberto: true, row, cancelando: false };
+    },
+
+    executarCancelamento() {
+      this.modal.cancelando = true;
+      const id = this.modal.row.id;
+
+      this.chamarAPI('cancelarAgendamento', { id: id })
+        .then(res => {
+          this.modal.aberto = false;
+          if (res.ok) {
+            const idx = this.agendamentos.findIndex(r => r.id === id);
+            if (idx !== -1) {
+              this.agendamentos[idx].status = 'CANCELADO';
+              this.stats.agendados  = Math.max(0, (this.stats.agendados  || 1) - 1);
+              this.stats.cancelados = (this.stats.cancelados || 0) + 1;
+            }
+            this.aplicarFiltros();
+            this.mostrarToast('Agendamento cancelado com sucesso.', 'sucesso');
+          } else {
+            this.mostrarToast(res.msg || 'Erro ao cancelar.', 'erro');
+          }
+        })
+        .catch(() => {
+          this.modal.aberto = false;
+          this.mostrarToast('Erro ao comunicar com o servidor.', 'erro');
+        });
+    },
+
+    aprovar(id) {
+      this.chamarAPI('aprovarAgendamento', { id: id })
+        .then(res => {
+          if (res && res.ok === false) {
+            this.mostrarToast(res.msg || 'Erro ao aprovar.', 'erro');
+            return;
+          }
+          const idx = this.agendamentos.findIndex(a => a.id === id);
+          if (idx !== -1) this.agendamentos[idx].aprovacao = 'APROVADO';
+          this.aplicarFiltros();
+          this.mostrarToast('Agendamento aprovado. E-mail enviado.', 'sucesso');
+        })
+        .catch(() => {
+          this.mostrarToast('Erro ao aprovar.', 'erro');
+        });
+    },
+
+    reprovar(id) {
+      this.chamarAPI('reprovarAgendamento', { id: id })
+        .then(res => {
+          if (res && res.ok === false) {
+            this.mostrarToast(res.msg || 'Erro ao reprovar.', 'erro');
+            return;
+          }
+          const idx = this.agendamentos.findIndex(a => a.id === id);
+          if (idx !== -1) this.agendamentos[idx].aprovacao = 'REPROVADO';
+          this.aplicarFiltros();
+          this.mostrarToast('Agendamento reprovado. E-mail enviado.', 'sucesso');
+        })
+        .catch(() => {
+          this.mostrarToast('Erro ao reprovar.', 'erro');
+        });
+    },
+
+    mostrarToast(msg, tipo) {
+      this.toast = { msg, tipo };
+      setTimeout(() => { this.toast.msg = ''; }, 4000);
+    }
+  };
+}
+</script>
+</body>
+</html>
