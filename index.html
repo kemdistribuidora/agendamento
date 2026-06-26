@@ -598,11 +598,19 @@
 const URL_APPS_SCRIPT = "https://script.google.com/macros/s/AKfycbxhbArGbLwpdvOJy4U7_sRf9qre9yKRHNNB3dWtnM6BBzLSMWATYafHVLo_mZsxq3QX/exec";
 
 function abrirLoginAdmin(event) {
-  const urlAtual = window.location.href.split('?')[0];
-  if (urlAtual.toLowerCase().endsWith('index.html')) return;
-
   event.preventDefault();
-  window.location.href = urlAtual + '?page=login';
+
+  const urlAtual = window.location.href.split('?')[0];
+
+  // Hospedagem estatica (arquivos .html lado a lado)
+  if (urlAtual.toLowerCase().endsWith('index.html')) {
+    window.location.href = 'login.html';
+    return;
+  }
+
+  // Deploy no Apps Script: o HTML roda num iframe sandbox, entao
+  // navegamos a janela de topo para a URL real /exec com ?page=login.
+  (window.top || window).location.href = URL_APPS_SCRIPT + '?page=login';
 }
 
 function renderIcons() {

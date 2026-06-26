@@ -657,11 +657,16 @@ const URL_AP_SCRIPT = "https://script.google.com/macros/s/AKfycbxhbArGbLwpdvOJy4
 
 function sairPainel() {
   const urlAtual = window.location.href.split('?')[0];
+
+  // Hospedagem estatica (arquivos .html lado a lado)
   if (urlAtual.toLowerCase().endsWith('admin.html')) {
     window.location.href = urlAtual.replace(/admin\.html$/i, 'index.html');
     return;
   }
-  window.location.href = urlAtual;
+
+  // Deploy no Apps Script: navega a janela de topo (fora do iframe sandbox)
+  // de volta para a raiz /exec, que renderiza o portal (index).
+  (window.top || window).location.href = URL_AP_SCRIPT;
 }
 
 function renderIcons() {

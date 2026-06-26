@@ -349,11 +349,16 @@ function login() {
 
     irParaAdmin() {
       const urlAtual = window.location.href.split('?')[0];
+
+      // Hospedagem estatica (arquivos .html lado a lado)
       if (urlAtual.toLowerCase().endsWith('login.html')) {
         window.location.href = urlAtual.replace(/login\.html$/i, 'admin.html');
         return;
       }
-      window.location.href = urlAtual + '?page=admin';
+
+      // Deploy no Apps Script: navega a janela de topo (fora do iframe sandbox)
+      // para a URL real /exec com ?page=admin.
+      (window.top || window).location.href = URL_APPS_SCRIPT + '?page=admin';
     },
 
     entrar() {
