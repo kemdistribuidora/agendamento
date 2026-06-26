@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
   <base target="_top">
@@ -315,7 +315,7 @@
 </main>
 
 <script>
-const URL_APPS_SCRIPT = "https://script.google.com/macros/s/AKfycbxhbArGbLwpdvOJy4U7_sRf9qre9yKRHNNB3dWtnM6BBzLSMWATYafHVLo_mZsxq3QX/exec";
+const URL_APPS_SCRIPT = "https://script.google.com/macros/s/AKfycbxm-xDgb0Vp3-UoeQbsG7sCFz5WMARSz9DxKhMGL7i3b7xfXzDSQqYDvUi4km99pVKr/exec";
 
 function renderIcons() {
   if (window.lucide) setTimeout(() => lucide.createIcons(), 0);
@@ -356,13 +356,13 @@ function login() {
         return;
       }
 
-      // Se você abrir apenas a pasta, adiciona admin.html ao final do caminho
+      // Se vocÃª abrir apenas a pasta, adiciona admin.html ao final do caminho
       if (urlAtual.endsWith('/')) {
         window.location.href = urlAtual + 'admin.html';
         return;
       }
 
-      // Fallback padrão para servidores locais (Ex: Live Server do VS Code)
+      // Fallback padrÃ£o para servidores locais (Ex: Live Server do VS Code)
       window.location.href = 'admin.html';
     },
 
@@ -398,3 +398,4 @@ function login() {
 </script>
 </body>
 </html>
+
