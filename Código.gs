@@ -437,7 +437,7 @@ function aprovarAgendamento(id) {
     return { ok: false, msg: 'Erro: ' + e.message };
   }
 }
-
+ 
 function reprovarAgendamento(id) {
   try {
     var aba   = getAba('Agendamentos');
