@@ -124,7 +124,7 @@
     }
 
     main {
-      width: min(1440px, 100%);
+      width: min(1760px, 100%);
       margin: 0 auto;
       padding: clamp(18px, 3vw, 30px);
     }
@@ -228,9 +228,12 @@
       align-items: center;
     }
 
-    .search-wrap i {
+    .search-wrap i,
+    .search-wrap svg {
       position: absolute;
       left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
       color: var(--muted);
       pointer-events: none;
     }
@@ -265,6 +268,34 @@
     .btn-icon { width: 40px; padding: 0; }
     .btn-sm { min-height: 32px; padding: 0 10px; font-size: .78rem; }
 
+    /* Botões de ação só com ícone (quadrado) + tooltip no hover */
+    .btn-acao {
+      position: relative;
+      width: 34px;
+      height: 34px;
+      min-height: 34px;
+      padding: 0;
+    }
+    .btn-acao::after {
+      content: attr(data-tip);
+      position: absolute;
+      right: calc(100% + 8px);
+      top: 50%;
+      transform: translateY(-50%);
+      padding: 4px 9px;
+      border-radius: 6px;
+      background: var(--ink);
+      color: #fff;
+      font-size: .72rem;
+      font-weight: 700;
+      white-space: nowrap;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .15s;
+      z-index: 60;
+    }
+    .btn-acao:hover::after { opacity: 1; }
+
     .table-wrap { overflow-x: auto; }
 
     table {
@@ -294,23 +325,24 @@
       border-bottom: 1px solid #edf2f7;
       color: var(--ink);
       vertical-align: middle;
+      white-space: nowrap;
     }
 
     tbody tr:hover { background: #f9fcff; }
     tbody tr:last-child td { border-bottom: 0; }
     .td-data { font-weight: 800; white-space: nowrap; }
     .td-hora { color: var(--brand); font-weight: 800; white-space: nowrap; }
-    .td-fornecedor { font-weight: 700; min-width: 180px; }
+    .td-fornecedor { font-weight: 700; }
     .td-cnpj { color: var(--muted); font-family: ui-monospace, SFMono-Regular, Consolas, monospace; font-size: .82rem; }
-    .td-nota { color: var(--ink); font-weight: 700; white-space: nowrap; }
-    .td-email { color: var(--muted); font-size: .82rem; max-width: 190px; overflow: hidden; text-overflow: ellipsis; }
+    .td-nota { color: var(--ink); font-weight: 700; }
+    .td-email { color: var(--muted); font-size: .82rem; }
     .td-created { color: var(--muted); font-size: .8rem; white-space: nowrap; }
 
     .doc-list, .acoes {
       display: flex;
       align-items: center;
       gap: 7px;
-      flex-wrap: wrap;
+      flex-wrap: nowrap;
     }
 
     .link-doc {
@@ -343,7 +375,7 @@
     }
 
     .badge-pendente { color: var(--warning); background: var(--warning-soft); border-color: #f5db9b; }
-    .badge-cancelado, .badge-reprovado { color: var(--danger); background: var(--danger-soft); border-color: #ffd1cc; }
+    .badge-reprovado { color: var(--danger); background: var(--danger-soft); border-color: #ffd1cc; }
     .badge-aprovado { color: var(--success); background: var(--success-soft); border-color: #bde9d1; }
 
     .spinner {
@@ -383,39 +415,6 @@
       background: var(--brand-soft);
     }
 
-    .modal-overlay {
-      position: fixed;
-      inset: 0;
-      z-index: 100;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 18px;
-      background: rgba(15, 23, 42, .5);
-      backdrop-filter: blur(4px);
-    }
-
-    .modal {
-      width: min(420px, 100%);
-      background: #fff;
-      border-radius: var(--radius);
-      border: 1px solid var(--line);
-      box-shadow: 0 24px 70px rgba(15, 23, 42, .25);
-      padding: 24px;
-    }
-
-    .modal h3 {
-      display: flex;
-      align-items: center;
-      gap: 9px;
-      font-size: 1.08rem;
-      margin-bottom: 9px;
-    }
-
-    .modal h3 i { color: var(--danger); }
-    .modal p { color: var(--muted); font-size: .92rem; line-height: 1.55; margin-bottom: 20px; }
-    .modal-actions { display: flex; justify-content: flex-end; gap: 10px; }
-
     .toast {
       position: fixed;
       right: 22px;
@@ -450,7 +449,7 @@
       .filters, .search-wrap, .input-search, .input-date, .select-filtro { width: 100%; }
       .btn { width: 100%; }
       .btn-icon { width: 40px; }
-      .modal-actions { flex-direction: column-reverse; }
+      .btn-acao { width: 34px; }
     }
   </style>
 </head>
@@ -501,8 +500,8 @@
       <div class="stat-card">
         <div class="stat-icon red"><i data-lucide="calendar-x" width="22" height="22"></i></div>
         <div>
-          <div class="stat-label">Cancelados</div>
-          <div class="stat-value" x-text="stats.cancelados ?? '-'"></div>
+          <div class="stat-label">Reprovados</div>
+          <div class="stat-value" x-text="stats.reprovados ?? '-'"></div>
         </div>
       </div>
     </section>
@@ -527,10 +526,11 @@
                  x-model="filtros.data"
                  @change="aplicarFiltros()">
 
-          <select class="field select-filtro" x-model="filtros.status" @change="aplicarFiltros()">
-            <option value="">Todos os status</option>
+          <select class="field select-filtro" x-model="filtros.aprovacao" @change="aplicarFiltros()">
+            <option value="">Todas as aprovações</option>
             <option value="PENDENTE">Pendente</option>
-            <option value="CANCELADO">Cancelado</option>
+            <option value="APROVADO">Aprovado</option>
+            <option value="REPROVADO">Reprovado</option>
           </select>
 
           <button class="btn btn-ghost" @click="limparFiltros()">
@@ -553,10 +553,9 @@
               <th>Hora</th>
               <th>Fornecedor</th>
               <th>CNPJ</th>
-              <th>Nota</th>
               <th>E-mail</th>
+              <th>Nota</th>
               <th>Documentos</th>
-              <th>Status</th>
               <th>Aprovação</th>
               <th>Criado em</th>
               <th>Ações</th>
@@ -564,14 +563,14 @@
           </thead>
           <tbody>
             <tr class="loading-row" x-show="carregando">
-              <td colspan="11">
+              <td colspan="10">
                 <span class="spinner spinner-dark"></span>
                 &nbsp; Carregando agendamentos...
               </td>
             </tr>
 
             <tr class="empty-row" x-show="!carregando && filtrados.length === 0">
-              <td colspan="11">
+              <td colspan="10">
                 <div class="empty-state">
                   <span class="empty-icon"><i data-lucide="inbox" width="25" height="25"></i></span>
                   <p x-text="agendamentos.length === 0 ? 'Nenhum agendamento encontrado.' : 'Nenhum resultado para os filtros aplicados.'"></p>
@@ -585,8 +584,8 @@
                 <td class="td-hora" x-text="row.horario"></td>
                 <td class="td-fornecedor" x-text="row.fornecedor"></td>
                 <td class="td-cnpj" x-text="row.cnpj"></td>
-                <td class="td-nota" x-text="row.nota || '—'"></td>
                 <td class="td-email" x-text="row.email"></td>
+                <td class="td-nota" x-text="row.nota || '—'"></td>
 
                 <td>
                   <div class="doc-list">
@@ -600,11 +599,6 @@
                 </td>
 
                 <td>
-                  <span class="badge badge-pendente" x-show="row.status === 'PENDENTE'"><i data-lucide="clock-3" width="14" height="14"></i> Pendente</span>
-                  <span class="badge badge-cancelado" x-show="row.status === 'CANCELADO'"><i data-lucide="x" width="14" height="14"></i> Cancelado</span>
-                </td>
-
-                <td>
                   <span class="badge badge-pendente" x-show="row.aprovacao === 'PENDENTE'"><i data-lucide="clock-3" width="14" height="14"></i> Pendente</span>
                   <span class="badge badge-aprovado" x-show="row.aprovacao === 'APROVADO'"><i data-lucide="check" width="14" height="14"></i> Aprovado</span>
                   <span class="badge badge-reprovado" x-show="row.aprovacao === 'REPROVADO'"><i data-lucide="x" width="14" height="14"></i> Reprovado</span>
@@ -614,24 +608,18 @@
 
                 <td>
                   <div class="acoes">
-                    <button class="btn btn-danger btn-sm"
-                            x-show="row.status === 'PENDENTE'"
-                            @click="confirmarCancelamento(row)">
-                      <i data-lucide="ban" width="14" height="14"></i> Cancelar
-                    </button>
-
-                    <template x-if="row.status === 'PENDENTE' && row.aprovacao === 'PENDENTE'">
+                    <template x-if="row.aprovacao === 'PENDENTE'">
                       <div class="acoes">
-                        <button class="btn btn-success btn-sm" @click="aprovar(row.id)">
-                          <i data-lucide="check" width="14" height="14"></i> Aprovar
+                        <button class="btn btn-success btn-acao" data-tip="Aprovar" @click="aprovar(row.id)">
+                          <i data-lucide="check" width="16" height="16"></i>
                         </button>
-                        <button class="btn btn-danger btn-sm" @click="reprovar(row.id)">
-                          <i data-lucide="x" width="14" height="14"></i> Reprovar
+                        <button class="btn btn-danger btn-acao" data-tip="Reprovar" @click="reprovar(row.id)">
+                          <i data-lucide="x" width="16" height="16"></i>
                         </button>
                       </div>
                     </template>
 
-                    <span style="color:var(--muted);font-size:.82rem;" x-show="row.status === 'CANCELADO'">-</span>
+                    <span style="color:var(--muted);font-size:.82rem;" x-show="row.aprovacao !== 'PENDENTE'">—</span>
                   </div>
                 </td>
               </tr>
@@ -642,25 +630,6 @@
     </section>
   </main>
 
-  <div class="modal-overlay" x-show="modal.aberto" x-transition style="display:none;">
-    <div class="modal" @click.stop>
-      <h3><i data-lucide="triangle-alert" width="20" height="20"></i> Cancelar agendamento?</h3>
-      <p>
-        Deseja cancelar o agendamento de
-        <strong x-text="modal.row?.fornecedor"></strong>
-        para <strong x-text="modal.row?.dataFormatada"></strong>
-        às <strong x-text="modal.row?.horario"></strong>?
-      </p>
-      <div class="modal-actions">
-        <button class="btn btn-ghost" @click="modal.aberto = false">Voltar</button>
-        <button class="btn btn-danger" @click="executarCancelamento()" :disabled="modal.cancelando">
-          <span class="spinner" x-show="modal.cancelando"></span>
-          <span x-text="modal.cancelando ? 'Cancelando...' : 'Confirmar cancelamento'"></span>
-        </button>
-      </div>
-    </div>
-  </div>
-
   <div class="toast"
        :class="toast.tipo === 'sucesso' ? 'toast-success' : 'toast-error'"
        x-show="toast.msg" x-transition style="display:none;">
@@ -669,7 +638,7 @@
   </div>
 
 <script>
-const URL_AP_SCRIPT = "https://script.google.com/macros/s/AKfycbxm-xDgb0Vp3-UoeQbsG7sCFz5WMARSz9DxKhMGL7i3b7xfXzDSQqYDvUi4km99pVKr/exec";
+const URL_AP_SCRIPT = "https://script.google.com/macros/s/AKfycbzU2GL7D7DIKY51nHP8dyRthSHZWxPe98noAGlvYnw-uor776ewtWnyvRT9UJY8QDDL/exec";
 
 function validarAcessoAdmin() {
   // O acesso é concedido apenas pelo login.html (que valida no backend).
@@ -713,13 +682,7 @@ function painel() {
     filtros: {
       busca: '',
       data: '',
-      status: ''
-    },
-
-    modal: {
-      aberto: false,
-      row: null,
-      cancelando: false
+      aprovacao: ''
     },
 
     toast: {
@@ -768,10 +731,10 @@ function painel() {
     },
 
     aplicarFiltros() {
-      const { busca, data, status } = this.filtros;
+      const { busca, data, aprovacao } = this.filtros;
 
       this.filtrados = this.agendamentos.filter(row => {
-        if (status && row.status !== status) return false;
+        if (aprovacao && row.aprovacao !== aprovacao) return false;
         if (data && row.data !== data) return false;
 
         if (busca) {
@@ -786,40 +749,9 @@ function painel() {
     },
 
     limparFiltros() {
-      this.filtros = { busca: '', data: '', status: '' };
+      this.filtros = { busca: '', data: '', aprovacao: '' };
       this.filtrados = [...this.agendamentos];
       renderIcons();
-    },
-
-    confirmarCancelamento(row) {
-      this.modal = { aberto: true, row, cancelando: false };
-      renderIcons();
-    },
-
-    executarCancelamento() {
-      this.modal.cancelando = true;
-      const id = this.modal.row.id;
-
-      this.chamarAPI('cancelarAgendamento', { id: id })
-        .then(res => {
-          this.modal.aberto = false;
-          if (res.ok) {
-            const idx = this.agendamentos.findIndex(r => r.id === id);
-            if (idx !== -1) {
-              this.agendamentos[idx].status = 'CANCELADO';
-              this.stats.agendados = Math.max(0, (this.stats.agendados || 1) - 1);
-              this.stats.cancelados = (this.stats.cancelados || 0) + 1;
-            }
-            this.aplicarFiltros();
-            this.mostrarToast('Agendamento cancelado com sucesso.', 'sucesso');
-          } else {
-            this.mostrarToast(res.msg || 'Erro ao cancelar.', 'erro');
-          }
-        })
-        .catch(() => {
-          this.modal.aberto = false;
-          this.mostrarToast('Erro ao comunicar com o servidor.', 'erro');
-        });
     },
 
     aprovar(id) {
@@ -847,7 +779,11 @@ function painel() {
             return;
           }
           const idx = this.agendamentos.findIndex(a => a.id === id);
-          if (idx !== -1) this.agendamentos[idx].aprovacao = 'REPROVADO';
+          if (idx !== -1 && this.agendamentos[idx].aprovacao !== 'REPROVADO') {
+            this.agendamentos[idx].aprovacao = 'REPROVADO';
+            this.stats.agendados = Math.max(0, (this.stats.agendados || 1) - 1);
+            this.stats.reprovados = (this.stats.reprovados || 0) + 1;
+          }
           this.aplicarFiltros();
           this.mostrarToast('Agendamento reprovado. E-mail enviado.', 'sucesso');
         })

@@ -55,11 +55,7 @@ function doPost(e) {
       case 'salvarAgendamento':
         response = salvarAgendamento(params);
         break;
-        
-      case 'cancelarAgendamento':
-        response = cancelarAgendamento(params.id);
-        break;
-        
+
       case 'aprovarAgendamento':
         response = aprovarAgendamento(params.id);
         break;
@@ -186,8 +182,8 @@ function obterHorariosDisponiveis(dataSelecionada) {
     var ocupados = [];
 
     for (var i = 1; i < dados.length; i++) {
-      var status = String(dados[i][8] || '').trim().toUpperCase();
-      if (status === 'CANCELADO') continue;
+      var aprov = String(dados[i][9] || '').trim().toUpperCase();
+      if (aprov === 'REPROVADO') continue;
       if (!dados[i][1]) continue;
 
       var dataBanco    = normalizarData(dados[i][1]);
@@ -218,11 +214,10 @@ function listarAgendamentos(filtros) {
     if (!linha[0] && !linha[1]) continue;
 
     var dataBanco  = normalizarData(linha[1]);
-    var statusVal  = String(linha[8] || 'PENDENTE').trim().toUpperCase();
     var aprovVal   = String(linha[9] || 'PENDENTE').trim().toUpperCase();
 
-    if (filtros.data   && filtros.data   !== '' && dataBanco !== filtros.data)   continue;
-    if (filtros.status && filtros.status !== '' && statusVal !== filtros.status.toUpperCase()) continue;
+    if (filtros.data && filtros.data !== '' && dataBanco !== filtros.data) continue;
+    if (filtros.aprovacao && filtros.aprovacao !== '' && aprovVal !== filtros.aprovacao.toUpperCase()) continue;
 
     if (filtros.busca && filtros.busca !== '') {
       var busca      = String(filtros.busca).toLowerCase();
@@ -254,11 +249,10 @@ function listarAgendamentos(filtros) {
       horario      : normalizarHorario(linha[2]),
       fornecedor   : String(linha[3] || ''),
       cnpj         : String(linha[4] || ''),
-      nota         : String(linha[11] || ''),
       email        : String(linha[5] || ''),
-      urlXml       : String(linha[6] || ''),
-      urlPdf       : String(linha[7] || ''),
-      status       : statusVal,
+      nota         : String(linha[6] || ''),
+      urlXml       : String(linha[7] || ''),
+      urlPdf       : String(linha[8] || ''),
       aprovacao    : aprovVal,
       criadoEm     : criadoEm
     });
@@ -280,7 +274,7 @@ function obterEstatisticas() {
     dados.shift();
 
     var hoje = Utilities.formatDate(new Date(), Session.getScriptTimeZone(), 'yyyy-MM-dd');
-    var agendados = 0, cancelados = 0, hoje_count = 0, semana_count = 0;
+    var agendados = 0, reprovados = 0, hoje_count = 0, semana_count = 0;
 
     var agora   = new Date();
     var domingo = new Date(agora);
@@ -293,12 +287,12 @@ function obterEstatisticas() {
     for (var i = 0; i < dados.length; i++) {
       if (!dados[i][1]) continue;
 
-      var status    = String(dados[i][8] || 'PENDENTE').trim().toUpperCase();
+      var aprov     = String(dados[i][9] || 'PENDENTE').trim().toUpperCase();
       var dataBanco = normalizarData(dados[i][1]);
       var dataObj   = (dados[i][1] instanceof Date) ? dados[i][1] : new Date(dataBanco + 'T12:00:00');
 
-      if (status === 'CANCELADO') {
-        cancelados++;
+      if (aprov === 'REPROVADO') {
+        reprovados++;
         continue;
       }
 
@@ -309,13 +303,13 @@ function obterEstatisticas() {
 
     return {
       agendados : agendados,
-      cancelados: cancelados,
+      reprovados: reprovados,
       hoje      : hoje_count,
       semana    : semana_count
     };
   } catch (e) {
     Logger.log('obterEstatisticas ERROR: ' + e);
-    return { agendados: 0, cancelados: 0, hoje: 0, semana: 0 };
+    return { agendados: 0, reprovados: 0, hoje: 0, semana: 0 };
   }
 }
 
@@ -347,8 +341,8 @@ function salvarAgendamento(dados) {
     for (var i = 1; i < registros.length; i++) {
       if (!registros[i][1]) continue;
 
-      var statusBanco   = String(registros[i][8] || '').trim().toUpperCase();
-      if (statusBanco === 'CANCELADO') continue;
+      var aprovBanco    = String(registros[i][9] || '').trim().toUpperCase();
+      if (aprovBanco === 'REPROVADO') continue;
 
       var dataBanco    = normalizarData(registros[i][1]);
       var horarioBanco = normalizarHorario(registros[i][2]);
@@ -367,18 +361,17 @@ function salvarAgendamento(dados) {
     var id = Utilities.getUuid();
 
     aba.appendRow([
-      id,
-      dados.data,
-      dados.horario,
-      dados.fornecedor,
-      dados.cnpj,
-      dados.email || '',
-      xmlArquivo.getUrl(),
-      pdfArquivo.getUrl(),
-      'PENDENTE',
-      'PENDENTE',
-      new Date(),
-      dados.nota || ''   // Coluna L — nº da nota fiscal
+      id,                    // A — ID
+      dados.data,            // B — DATA
+      dados.horario,         // C — HORA
+      dados.fornecedor,      // D — FORNECEDOR
+      dados.cnpj,            // E — CNPJ
+      dados.email || '',     // F — EMAIL
+      dados.nota || '',      // G — NOTA
+      xmlArquivo.getUrl(),   // H — XML
+      pdfArquivo.getUrl(),   // I — PDF
+      'PENDENTE',            // J — APROVAÇÃO
+      new Date()             // K — CRIADO EM
     ]);
 
     return { ok: true, msg: 'Agendamento realizado com sucesso!' };
@@ -388,24 +381,6 @@ function salvarAgendamento(dados) {
     return { ok: false, msg: 'Erro: ' + e.message };
   } finally {
     lock.releaseLock();
-  }
-}
-
-function cancelarAgendamento(id) {
-  try {
-    var aba   = getAba('Agendamentos');
-    var dados = aba.getDataRange().getValues();
-
-    for (var i = 1; i < dados.length; i++) {
-      if (String(dados[i][0]) === String(id)) {
-        aba.getRange(i + 1, 9).setValue('CANCELADO');
-        return { ok: true, msg: 'Agendamento cancelado.' };
-      }
-    }
-    return { ok: false, msg: 'Registro não encontrado.' };
-  } catch (e) {
-    Logger.log('cancelarAgendamento ERROR: ' + e);
-    return { ok: false, msg: 'Erro: ' + e.message };
   }
 }
 
