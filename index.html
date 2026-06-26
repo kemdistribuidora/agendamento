@@ -602,14 +602,18 @@ function abrirLoginAdmin(event) {
 
   const urlAtual = window.location.href.split('?')[0];
 
-  // Hospedagem estatica (arquivos .html lado a lado)
-  if (urlAtual.toLowerCase().endsWith('index.html')) {
-    window.location.href = 'login.html';
+  // Se você estiver rodando em ambiente local (Live Server ou arquivo direto)
+  if (urlAtual.startsWith('http://localhost') || urlAtual.startsWith('http://127.0.0.1') || urlAtual.startsWith('file:///')) {
+    // Descobre o caminho da pasta atual para redirecionar para o login.html local
+    if (urlAtual.endsWith('/')) {
+      window.location.href = urlAtual + 'login.html';
+    } else {
+      window.location.href = urlAtual.replace(/[^\/]*$/, 'login.html');
+    }
     return;
   }
 
-  // Deploy no Apps Script: o HTML roda num iframe sandbox, entao
-  // navegamos a janela de topo para a URL real /exec com ?page=login.
+  // Fallback caso você use o deploy de páginas internas do Apps Script futuramente
   (window.top || window).location.href = URL_APPS_SCRIPT + '?page=login';
 }
 
