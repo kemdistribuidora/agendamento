@@ -5,6 +5,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Agendamento de Entregas</title>
+  <link rel="icon" type="image/png" href="imagens/Distribuidora_KEM.png">
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -18,10 +19,13 @@
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --brand: #1769aa;
-      --brand-dark: #0f416f;
-      --brand-soft: #e8f3fb;
-      --accent: #00a39b;
+      --brand: #024a70;
+      --brand-dark: #002a44;
+      --brand-soft: #e8f1f8;
+      --accent: #ee7a1c;
+      --accent-dark: #c5331b;
+      --accent-soft: #fdeede;
+      --wave: linear-gradient(90deg, var(--accent), var(--accent-dark));
       --success: #16824a;
       --success-soft: #e8f7ef;
       --danger: #b42318;
@@ -43,7 +47,7 @@
       min-height: 100vh;
       color: var(--ink);
       background:
-        radial-gradient(circle at top left, rgba(0, 163, 155, .14), transparent 30%),
+        radial-gradient(circle at top left, rgba(238, 122, 28, .12), transparent 30%),
         linear-gradient(180deg, #eef5fb 0%, var(--canvas) 38%, #fff 100%);
       display: flex;
       flex-direction: column;
@@ -64,6 +68,16 @@
       z-index: 20;
     }
 
+    header::after {
+      content: '';
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: -1px;
+      height: 3px;
+      background: var(--wave);
+    }
+
     .brand {
       display: flex;
       align-items: center;
@@ -71,21 +85,21 @@
       min-width: 0;
     }
 
-    .brand-icon, .mini-icon, .success-icon {
+    .mini-icon, .success-icon {
       display: inline-flex;
       align-items: center;
       justify-content: center;
       flex-shrink: 0;
     }
 
-    .brand-icon {
-      width: 44px;
-      height: 44px;
-      border-radius: var(--radius);
-      color: #fff;
-      background: linear-gradient(135deg, var(--brand), var(--accent));
-      box-shadow: var(--shadow-sm);
+    .brand-logo {
+      height: 46px;
+      width: auto;
+      display: block;
+      flex-shrink: 0;
     }
+
+    .brand-text { min-width: 0; padding-left: 14px; border-left: 1px solid var(--line); }
 
     header h1 { font-size: 1.05rem; font-weight: 800; letter-spacing: 0; }
     header p { color: var(--muted); font-size: .82rem; margin-top: 2px; }
@@ -126,9 +140,9 @@
       display: inline-flex;
       align-items: center;
       gap: 8px;
-      color: var(--brand-dark);
-      background: var(--brand-soft);
-      border: 1px solid #cfe6f7;
+      color: var(--accent-dark);
+      background: var(--accent-soft);
+      border: 1px solid #f7d4ba;
       border-radius: 999px;
       padding: 7px 12px;
       font-size: .78rem;
@@ -222,7 +236,7 @@
       flex-shrink: 0;
     }
 
-    .step.active { border-color: #9cd4f4; background: var(--brand-soft); color: var(--brand-dark); }
+    .step.active { border-color: #8fb6d4; background: var(--brand-soft); color: var(--brand-dark); }
     .step.active .step-num { background: var(--brand); color: #fff; }
     .step.done { border-color: #bde9d1; background: var(--success-soft); color: var(--success); }
     .step.done .step-num { background: var(--success); color: #fff; }
@@ -268,7 +282,7 @@
     input:focus, select:focus {
       border-color: var(--brand);
       background: #fff;
-      box-shadow: 0 0 0 4px rgba(23, 105, 170, .12);
+      box-shadow: 0 0 0 4px rgba(2, 74, 112, .12);
     }
 
     input::placeholder { color: #94a3b8; }
@@ -382,10 +396,10 @@
 
     .btn:active:not(:disabled) { transform: scale(.99); }
     .btn:disabled { opacity: .6; cursor: not-allowed; }
-    .btn-primary { width: 100%; color: #fff; background: linear-gradient(135deg, var(--brand), var(--brand-dark)); box-shadow: 0 12px 28px rgba(23, 105, 170, .2); }
-    .btn-primary:hover:not(:disabled) { box-shadow: 0 16px 34px rgba(23, 105, 170, .28); }
+    .btn-primary { width: 100%; color: #fff; background: linear-gradient(135deg, var(--brand), var(--brand-dark)); box-shadow: 0 12px 28px rgba(2, 74, 112, .2); }
+    .btn-primary:hover:not(:disabled) { box-shadow: 0 16px 34px rgba(2, 74, 112, .28); }
     .btn-secondary { color: var(--ink); background: #eef3f7; border: 1px solid var(--line); }
-    .btn-outline { color: var(--brand-dark); background: #fff; border: 1px solid #b9d8ee; }
+    .btn-outline { color: var(--brand-dark); background: #fff; border: 1px solid #b3cee2; }
 
     .spinner {
       width: 18px;
@@ -470,8 +484,8 @@
 
 <header>
   <div class="brand">
-    <div class="brand-icon"><i data-lucide="package-check" width="23" height="23"></i></div>
-    <div>
+    <img class="brand-logo" src="imagens/Distribuidora_KEM.png" alt="KEM - Distribuidora de Alimentos">
+    <div class="brand-text">
       <h1>Portal de Entregas</h1>
       <p>Agendamento de recebimento de mercadorias</p>
     </div>

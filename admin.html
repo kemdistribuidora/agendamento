@@ -5,6 +5,7 @@
   <meta charset="UTF-8"> 
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Painel Admin - Agendamentos</title>
+  <link rel="icon" type="image/png" href="imagens/Distribuidora_KEM.png">
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -15,10 +16,13 @@
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --brand: #1769aa;
-      --brand-dark: #0f416f;
-      --brand-soft: #e8f3fb;
-      --accent: #00a39b;
+      --brand: #024a70;
+      --brand-dark: #002a44;
+      --brand-soft: #e8f1f8;
+      --accent: #ee7a1c;
+      --accent-dark: #c5331b;
+      --accent-soft: #fdeede;
+      --wave: linear-gradient(90deg, var(--accent), var(--accent-dark));
       --success: #16824a;
       --success-soft: #e8f7ef;
       --danger: #b42318;
@@ -40,7 +44,7 @@
       min-height: 100vh;
       color: var(--ink);
       background:
-        radial-gradient(circle at top right, rgba(0, 163, 155, .12), transparent 28%),
+        radial-gradient(circle at top right, rgba(238, 122, 28, .10), transparent 28%),
         linear-gradient(180deg, #eef5fb 0%, var(--canvas) 36%, #fff 100%);
     }
 
@@ -61,6 +65,16 @@
       z-index: 50;
     }
 
+    header::after {
+      content: '';
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: -1px;
+      height: 3px;
+      background: var(--wave);
+    }
+
     .header-left {
       display: flex;
       align-items: center;
@@ -68,21 +82,21 @@
       min-width: 0;
     }
 
-    .header-icon, .stat-icon, .empty-icon {
+    .stat-icon, .empty-icon {
       display: inline-flex;
       align-items: center;
       justify-content: center;
       flex-shrink: 0;
     }
 
-    .header-icon {
-      width: 42px;
+    .header-logo {
       height: 42px;
-      border-radius: var(--radius);
-      color: #fff;
-      background: linear-gradient(135deg, var(--brand), var(--accent));
-      box-shadow: var(--shadow-sm);
+      width: auto;
+      display: block;
+      flex-shrink: 0;
     }
+
+    .header-text { min-width: 0; padding-left: 12px; border-left: 1px solid var(--line); }
 
     header h1 { font-size: 1.05rem; font-weight: 800; letter-spacing: 0; }
     .header-sub { color: var(--muted); font-size: .8rem; margin-top: 2px; }
@@ -103,7 +117,7 @@
       border-radius: var(--radius);
       color: var(--brand-dark);
       background: var(--brand-soft);
-      border: 1px solid #cfe6f7;
+      border: 1px solid #c5d8e8;
       font-size: .8rem;
       font-weight: 800;
       white-space: nowrap;
@@ -199,7 +213,7 @@
     .field:focus {
       border-color: var(--brand);
       background: #fff;
-      box-shadow: 0 0 0 4px rgba(23, 105, 170, .12);
+      box-shadow: 0 0 0 4px rgba(2, 74, 112, .12);
     }
 
     .input-search {
@@ -244,7 +258,7 @@
     .btn:hover:not(:disabled) { opacity: .9; }
     .btn:active:not(:disabled) { transform: scale(.99); }
     .btn:disabled { opacity: .55; cursor: not-allowed; }
-    .btn-primary { color: #fff; background: linear-gradient(135deg, var(--brand), var(--brand-dark)); box-shadow: 0 10px 22px rgba(23, 105, 170, .18); }
+    .btn-primary { color: #fff; background: linear-gradient(135deg, var(--brand), var(--brand-dark)); box-shadow: 0 10px 22px rgba(2, 74, 112, .18); }
     .btn-success { color: #fff; background: var(--success); }
     .btn-danger { color: #fff; background: var(--danger); }
     .btn-ghost { color: var(--ink); background: #eef3f7; border: 1px solid var(--line); }
@@ -444,8 +458,8 @@
 
   <header>
     <div class="header-left">
-      <div class="header-icon"><i data-lucide="layout-dashboard" width="22" height="22"></i></div>
-      <div>
+      <img class="header-logo" src="imagens/Distribuidora_KEM.png" alt="KEM - Distribuidora de Alimentos">
+      <div class="header-text">
         <h1>Painel de Agendamentos</h1>
         <div class="header-sub">Acompanhe, aprove e gerencie entregas</div>
       </div>
