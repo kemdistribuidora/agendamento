@@ -443,7 +443,7 @@ function reprovarAgendamento(id) {
     var aba   = getAba('Agendamentos');
     var dados = aba.getDataRange().getValues();
 
-    for (var i = 1; i < dados.length; i++) {
+    for (var i = 1; i < dados.length; i++) { 
       if (String(dados[i][0]) === String(id)) {
 
         aba.getRange(i + 1, 10).setValue('REPROVADO');
