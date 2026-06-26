@@ -274,6 +274,62 @@
     input::placeholder { color: #94a3b8; }
     select:disabled { color: #94a3b8; cursor: not-allowed; }
 
+    /* Flatpickr: impede que as regras globais de input/select vazem para os
+       controles internos do calendario (mes/ano ficavam estourados e por baixo dos dias). */
+    .flatpickr-calendar input,
+    .flatpickr-calendar select {
+      width: auto;
+      min-height: 0;
+      height: auto;
+      padding: 0;
+      border: 0;
+      border-radius: 0;
+      background: transparent;
+      box-shadow: none;
+      font: inherit;
+    }
+    .flatpickr-calendar input:focus,
+    .flatpickr-calendar select:focus {
+      background: transparent;
+      box-shadow: none;
+    }
+    .flatpickr-current-month {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      font-size: .95rem;
+    }
+    .flatpickr-current-month .flatpickr-monthDropdown-months,
+    .flatpickr-current-month input.cur-year {
+      color: var(--ink);
+      font-weight: 800;
+      font-size: .95rem;
+    }
+    .flatpickr-current-month .flatpickr-monthDropdown-months {
+      padding: 2px 6px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background .15s;
+    }
+    .flatpickr-current-month .flatpickr-monthDropdown-months:hover { background: var(--brand-soft); }
+    .flatpickr-current-month .numInputWrapper { width: 6ch; }
+    .flatpickr-current-month .numInputWrapper span { border: 0; }
+    .flatpickr-current-month .numInputWrapper span:hover { background: var(--brand-soft); }
+
+    /* Setas de navegacao e dia selecionado no tom da marca */
+    .flatpickr-months .flatpickr-prev-month,
+    .flatpickr-months .flatpickr-next-month { fill: var(--brand); color: var(--brand); }
+    .flatpickr-months .flatpickr-prev-month:hover svg,
+    .flatpickr-months .flatpickr-next-month:hover svg { fill: var(--brand-dark); }
+    .flatpickr-day.selected,
+    .flatpickr-day.selected:hover {
+      background: var(--brand);
+      border-color: var(--brand);
+    }
+    .flatpickr-day:hover { background: var(--brand-soft); border-color: var(--brand-soft); }
+    span.flatpickr-weekday { color: var(--muted); font-weight: 700; }
+
     .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
 
     .helper-text {
