@@ -420,25 +420,25 @@
       <p>Agendamento de recebimento de mercadorias</p>
     </div>
   </div>
-  <a class="admin-link" href="admin.html" onclick="abrirLoginAdmin(event)" title="Area administrativa">
+  <a class="admin-link" href="login.html" title="Área administrativa">
     <i data-lucide="shield-check" width="18" height="18"></i>
-    <span>Area administrativa</span>
+    <span>Área administrativa</span>
   </a>
 </header>
 
 <main>
   <section class="intro" aria-label="Resumo do portal">
     <div class="eyebrow"><i data-lucide="calendar-clock" width="15" height="15"></i> Agendamento online</div>
-    <h2>Entregas organizadas, com horario confirmado.</h2>
-    <p>Informe os dados da nota, escolha uma data disponivel e envie os documentos para analise do recebimento.</p>
+    <h2>Entregas organizadas, com horário confirmado.</h2>
+    <p>Informe os dados da nota, escolha uma data disponível e envie os documentos para análise do recebimento.</p>
     <div class="support-list">
       <div class="support-item">
         <span class="mini-icon"><i data-lucide="file-check-2" width="18" height="18"></i></span>
-        <span>XML e DANFE ficam vinculados ao pedido para aprovacao interna.</span>
+        <span>XML e DANFE ficam vinculados ao pedido para aprovação interna.</span>
       </div>
       <div class="support-item">
         <span class="mini-icon"><i data-lucide="mail-check" width="18" height="18"></i></span>
-        <span>O retorno de aprovacao ou reprovacao sera enviado para o e-mail informado.</span>
+        <span>O retorno de aprovação ou reprovação será enviado para o e-mail informado.</span>
       </div>
     </div>
   </section>
@@ -469,7 +469,7 @@
 
       <div class="form-group">
         <label>Fornecedor *</label>
-        <input type="text" x-model="form.fornecedor" placeholder="Razao social ou nome fantasia">
+        <input type="text" x-model="form.fornecedor" placeholder="Razão social ou nome fantasia">
       </div>
 
       <div class="grid-2">
@@ -478,7 +478,7 @@
           <input type="text" x-model="form.cnpj" @input="formatarCNPJ($event)" maxlength="18" placeholder="00.000.000/0000-00">
         </div>
         <div class="form-group">
-          <label>No. da nota *</label>
+          <label>Nº da nota *</label>
           <input type="text" x-model="form.nota" placeholder="Ex: 001234">
         </div>
       </div>
@@ -489,12 +489,12 @@
       </div>
 
       <button class="btn btn-primary" @click="irParaEtapa2()">
-        Proximo <i data-lucide="arrow-right" width="18" height="18"></i>
+        Próximo <i data-lucide="arrow-right" width="18" height="18"></i>
       </button>
     </div>
 
     <div x-show="etapa === 2 && !concluido" x-transition>
-      <div class="section-title"><i data-lucide="calendar-days" width="21" height="21"></i> Data e horario de entrega</div>
+      <div class="section-title"><i data-lucide="calendar-days" width="21" height="21"></i> Data e horário de entrega</div>
 
       <div class="form-group">
         <label>Data da entrega *</label>
@@ -502,14 +502,14 @@
       </div>
 
       <div class="form-group">
-        <label>Horario disponivel *</label>
+        <label>Horário disponível *</label>
         <select x-show="!form.data || carregandoHorarios || horarios.length === 0" disabled>
-          <option x-text="carregandoHorarios ? 'Carregando horarios...' : (form.data ? 'Nenhum horario disponivel' : 'Selecione a data primeiro')"></option>
+          <option x-text="carregandoHorarios ? 'Carregando horários...' : (form.data ? 'Nenhum horário disponível' : 'Selecione a data primeiro')"></option>
         </select>
 
         <select x-show="form.data && !carregandoHorarios && horarios.length > 0" x-model="form.horario">
-          <option value="">Selecione um horario</option>
-          <optgroup label="Manha">
+          <option value="">Selecione um horário</option>
+          <optgroup label="Manhã">
             <template x-for="h in horariosManha" :key="h">
               <option :value="h" x-text="h"></option>
             </template>
@@ -522,13 +522,13 @@
         </select>
 
         <p class="helper-text" x-show="form.data && !carregandoHorarios && horarios.length === 0">
-          <i data-lucide="info" width="15" height="15"></i> Nenhum horario disponivel nesta data. Escolha outra.
+          <i data-lucide="info" width="15" height="15"></i> Nenhum horário disponível nesta data. Escolha outra.
         </p>
       </div>
 
       <div class="btn-row">
         <button class="btn btn-secondary" @click="etapa = 1"><i data-lucide="arrow-left" width="18" height="18"></i> Voltar</button>
-        <button class="btn btn-primary" @click="irParaEtapa3()">Proximo <i data-lucide="arrow-right" width="18" height="18"></i></button>
+        <button class="btn btn-primary" @click="irParaEtapa3()">Próximo <i data-lucide="arrow-right" width="18" height="18"></i></button>
       </div>
     </div>
 
@@ -570,12 +570,12 @@
 
     <div x-show="concluido" x-transition class="success-screen">
       <div class="success-icon"><i data-lucide="party-popper" width="30" height="30"></i></div>
-      <h3>Solicitacao enviada</h3>
-      <p>Seu agendamento foi enviado para analise do setor de recebimento.</p>
-      <p>Voce recebera um retorno no e-mail informado apos a aprovacao ou reprovacao.</p>
+      <h3>Solicitação enviada</h3>
+      <p>Seu agendamento foi enviado para análise do setor de recebimento.</p>
+      <p>Você receberá um retorno no e-mail informado após a aprovação ou reprovação.</p>
 
       <div class="notice">
-        <strong>Dica:</strong> verifique sua pasta de Spam/Lixo Eletronico. Se o e-mail estiver la, marque como "Nao e spam".
+        <strong>Dica:</strong> verifique sua pasta de Spam/Lixo Eletrônico. Se o e-mail estiver lá, marque como "Não é spam".
       </div>
 
       <div class="success-detail">
@@ -583,7 +583,7 @@
           <dt>Fornecedor</dt><dd x-text="form.fornecedor"></dd>
           <dt>CNPJ</dt><dd x-text="form.cnpj"></dd>
           <dt>Data</dt><dd x-text="dataFormatadaDisplay()"></dd>
-          <dt>Horario</dt><dd x-text="form.horario"></dd>
+          <dt>Horário</dt><dd x-text="form.horario"></dd>
           <dt>Nota fiscal</dt><dd x-text="form.nota"></dd>
         </dl>
       </div>
@@ -596,21 +596,6 @@
 
 <script>
 const URL_APPS_SCRIPT = "https://script.google.com/macros/s/AKfycbxm-xDgb0Vp3-UoeQbsG7sCFz5WMARSz9DxKhMGL7i3b7xfXzDSQqYDvUi4km99pVKr/exec";
-
-function abrirLoginAdmin(event) {
-  event.preventDefault();
-
-  const senhaInformada = prompt('Digite a senha de acesso ao painel administrativo:');
-  if (!senhaInformada) return;
-
-  if (senhaInformada.trim().toLowerCase() === 'kem2026') {
-    sessionStorage.setItem('adminAccess', 'true');
-    window.location.href = 'admin.html';
-    return;
-  }
-
-  alert('Senha incorreta.');
-}
 
 function renderIcons() {
   if (window.lucide) setTimeout(() => lucide.createIcons(), 0);
@@ -681,8 +666,8 @@ function agendamento() {
     irParaEtapa2() {
       if (!this.form.fornecedor.trim()) return this.mostrarAlerta('Informe o nome do fornecedor.');
       const cnpjNum = this.form.cnpj.replace(/\D/g, '');
-      if (cnpjNum.length !== 14) return this.mostrarAlerta('CNPJ invalido. Digite os 14 digitos.');
-      if (!this.form.nota.trim()) return this.mostrarAlerta('Informe o numero da Nota Fiscal.');
+      if (cnpjNum.length !== 14) return this.mostrarAlerta('CNPJ inválido. Digite os 14 dígitos.');
+      if (!this.form.nota.trim()) return this.mostrarAlerta('Informe o número da Nota Fiscal.');
       if (!this.form.email.trim()) return this.mostrarAlerta('Informe o e-mail.');
       this.alerta.msg = '';
       this.etapa = 2;
@@ -691,7 +676,7 @@ function agendamento() {
 
     irParaEtapa3() {
       if (!this.form.data) return this.mostrarAlerta('Selecione uma data.');
-      if (!this.form.horario) return this.mostrarAlerta('Selecione um horario disponivel.');
+      if (!this.form.horario) return this.mostrarAlerta('Selecione um horário disponível.');
       this.alerta.msg = '';
       this.etapa = 3;
       renderIcons();
@@ -713,7 +698,7 @@ function agendamento() {
         })
         .catch(() => {
           this.carregandoHorarios = false;
-          this.mostrarAlerta('Erro ao carregar horarios. Tente novamente.');
+          this.mostrarAlerta('Erro ao carregar horários. Tente novamente.');
         });
     },
 
@@ -721,7 +706,7 @@ function agendamento() {
       const file = event.target.files[0];
       if (!file) return;
       if (file.size > 10 * 1024 * 1024) {
-        this.mostrarAlerta(`O arquivo ${tipo.toUpperCase()} deve ter no maximo 10 MB.`);
+        this.mostrarAlerta(`O arquivo ${tipo.toUpperCase()} deve ter no máximo 10 MB.`);
         event.target.value = '';
         return;
       }

@@ -257,7 +257,7 @@
       width: 100%;
       border-collapse: collapse;
       font-size: .86rem;
-      min-width: 1120px;
+      min-width: 1200px;
     }
 
     thead th {
@@ -289,6 +289,7 @@
     .td-hora { color: var(--brand); font-weight: 800; white-space: nowrap; }
     .td-fornecedor { font-weight: 700; min-width: 180px; }
     .td-cnpj { color: var(--muted); font-family: ui-monospace, SFMono-Regular, Consolas, monospace; font-size: .82rem; }
+    .td-nota { color: var(--ink); font-weight: 700; white-space: nowrap; }
     .td-email { color: var(--muted); font-size: .82rem; max-width: 190px; overflow: hidden; text-overflow: ellipsis; }
     .td-created { color: var(--muted); font-size: .8rem; white-space: nowrap; }
 
@@ -437,6 +438,8 @@
       .btn { width: 100%; }
       .btn-icon { width: 40px; }
       .modal-actions { flex-direction: column-reverse; }
+      /* No mobile o header muda de altura; o cabeçalho fixo da tabela desalinharia */
+      thead th { position: static; top: auto; }
     }
   </style>
 </head>
@@ -497,7 +500,7 @@
       <div class="toolbar">
         <div>
           <div class="toolbar-title">Agendamentos</div>
-          <div class="toolbar-sub">Use filtros para encontrar fornecedores, datas e pendencias.</div>
+          <div class="toolbar-sub">Use filtros para encontrar fornecedores, datas e pendências.</div>
         </div>
 
         <div class="filters">
@@ -539,24 +542,25 @@
               <th>Hora</th>
               <th>Fornecedor</th>
               <th>CNPJ</th>
-              <th>Email</th>
+              <th>Nota</th>
+              <th>E-mail</th>
               <th>Documentos</th>
               <th>Status</th>
-              <th>Aprovacao</th>
+              <th>Aprovação</th>
               <th>Criado em</th>
-              <th>Acoes</th>
+              <th>Ações</th>
             </tr>
           </thead>
           <tbody>
             <tr class="loading-row" x-show="carregando">
-              <td colspan="10">
+              <td colspan="11">
                 <span class="spinner spinner-dark"></span>
                 &nbsp; Carregando agendamentos...
               </td>
             </tr>
 
             <tr class="empty-row" x-show="!carregando && filtrados.length === 0">
-              <td colspan="10">
+              <td colspan="11">
                 <div class="empty-state">
                   <span class="empty-icon"><i data-lucide="inbox" width="25" height="25"></i></span>
                   <p x-text="agendamentos.length === 0 ? 'Nenhum agendamento encontrado.' : 'Nenhum resultado para os filtros aplicados.'"></p>
@@ -570,6 +574,7 @@
                 <td class="td-hora" x-text="row.horario"></td>
                 <td class="td-fornecedor" x-text="row.fornecedor"></td>
                 <td class="td-cnpj" x-text="row.cnpj"></td>
+                <td class="td-nota" x-text="row.nota || '—'"></td>
                 <td class="td-email" x-text="row.email"></td>
 
                 <td>
@@ -633,7 +638,7 @@
         Deseja cancelar o agendamento de
         <strong x-text="modal.row?.fornecedor"></strong>
         para <strong x-text="modal.row?.dataFormatada"></strong>
-        as <strong x-text="modal.row?.horario"></strong>?
+        às <strong x-text="modal.row?.horario"></strong>?
       </p>
       <div class="modal-actions">
         <button class="btn btn-ghost" @click="modal.aberto = false">Voltar</button>
@@ -656,22 +661,10 @@
 const URL_AP_SCRIPT = "https://script.google.com/macros/s/AKfycbxm-xDgb0Vp3-UoeQbsG7sCFz5WMARSz9DxKhMGL7i3b7xfXzDSQqYDvUi4km99pVKr/exec";
 
 function validarAcessoAdmin() {
-  const jaAutorizado = sessionStorage.getItem('adminAccess') === 'true';
-  if (jaAutorizado) return true;
+  // O acesso é concedido apenas pelo login.html (que valida no backend).
+  if (sessionStorage.getItem('adminAccess') === 'true') return true;
 
-  const senhaInformada = prompt('Digite a senha de acesso ao painel administrativo:');
-  if (!senhaInformada) {
-    window.location.href = 'index.html';
-    return false;
-  }
-
-  if (senhaInformada.trim().toLowerCase() === 'kem2026') {
-    sessionStorage.setItem('adminAccess', 'true');
-    return true;
-  }
-
-  alert('Senha incorreta.');
-  window.location.href = 'index.html';
+  window.location.href = 'login.html';
   return false;
 }
 

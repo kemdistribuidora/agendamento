@@ -261,8 +261,8 @@
   <section class="intro" aria-label="Acesso administrativo">
     <div class="brand-icon"><i data-lucide="shield-check" width="28" height="28"></i></div>
     <div class="eyebrow"><i data-lucide="lock-keyhole" width="15" height="15"></i> Acesso restrito</div>
-    <h1>Area administrativa.</h1>
-    <p>Entre para acompanhar agendamentos, aprovar solicitacoes, reprovar pendencias e manter o recebimento organizado.</p>
+    <h1>Área administrativa.</h1>
+    <p>Entre para acompanhar agendamentos, aprovar solicitações, reprovar pendências e manter o recebimento organizado.</p>
   </section>
 
   <section>
@@ -275,11 +275,11 @@
       </div>
 
       <div class="form-group">
-        <label>Usuario</label>
+        <label>Usuário</label>
         <div class="input-wrap">
           <span class="input-icon"><i data-lucide="user" width="18" height="18"></i></span>
           <input type="text" x-model="usuario"
-                 placeholder="Digite o usuario"
+                 placeholder="Digite o usuário"
                  autocomplete="username"
                  @keydown.enter="entrar()">
         </div>
@@ -356,18 +356,18 @@ function login() {
         return;
       }
 
-      // Se vocÃª abrir apenas a pasta, adiciona admin.html ao final do caminho
+      // Se você abrir apenas a pasta, adiciona admin.html ao final do caminho
       if (urlAtual.endsWith('/')) {
         window.location.href = urlAtual + 'admin.html';
         return;
       }
 
-      // Fallback padrÃ£o para servidores locais (Ex: Live Server do VS Code)
+      // Fallback padrão para servidores locais (Ex: Live Server do VS Code)
       window.location.href = 'admin.html';
     },
 
     entrar() {
-      if (!this.usuario.trim()) { this.erro = 'Informe o usuario.'; renderIcons(); return; }
+      if (!this.usuario.trim()) { this.erro = 'Informe o usuário.'; renderIcons(); return; }
       if (!this.senha.trim()) { this.erro = 'Informe a senha.'; renderIcons(); return; }
 
       this.erro = '';
@@ -381,9 +381,10 @@ function login() {
         .then(res => {
           this.carregando = false;
           if (res && res.ok) {
+            sessionStorage.setItem('adminAccess', 'true');
             this.irParaAdmin();
           } else {
-            this.erro = res?.msg || 'Usuario ou senha invalidos.';
+            this.erro = res?.msg || 'Usuário ou senha inválidos.';
           }
           renderIcons();
         })

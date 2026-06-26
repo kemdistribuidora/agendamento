@@ -254,6 +254,7 @@ function listarAgendamentos(filtros) {
       horario      : normalizarHorario(linha[2]),
       fornecedor   : String(linha[3] || ''),
       cnpj         : String(linha[4] || ''),
+      nota         : String(linha[11] || ''),
       email        : String(linha[5] || ''),
       urlXml       : String(linha[6] || ''),
       urlPdf       : String(linha[7] || ''),
@@ -376,7 +377,8 @@ function salvarAgendamento(dados) {
       pdfArquivo.getUrl(),
       'PENDENTE',
       'PENDENTE',
-      new Date()
+      new Date(),
+      dados.nota || ''   // Coluna L — nº da nota fiscal
     ]);
 
     return { ok: true, msg: 'Agendamento realizado com sucesso!' };
