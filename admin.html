@@ -655,11 +655,36 @@
 <script>
 const URL_AP_SCRIPT = "https://script.google.com/macros/s/AKfycbxm-xDgb0Vp3-UoeQbsG7sCFz5WMARSz9DxKhMGL7i3b7xfXzDSQqYDvUi4km99pVKr/exec";
 
+function validarAcessoAdmin() {
+  const jaAutorizado = sessionStorage.getItem('adminAccess') === 'true';
+  if (jaAutorizado) return true;
+
+  const senhaInformada = prompt('Digite a senha de acesso ao painel administrativo:');
+  if (!senhaInformada) {
+    window.location.href = 'index.html';
+    return false;
+  }
+
+  if (senhaInformada.trim().toLowerCase() === 'kem2026') {
+    sessionStorage.setItem('adminAccess', 'true');
+    return true;
+  }
+
+  alert('Senha incorreta.');
+  window.location.href = 'index.html';
+  return false;
+}
+
+if (!validarAcessoAdmin()) {
+  document.documentElement.style.display = 'none';
+}
+
 function sairPainel() {
+  sessionStorage.removeItem('adminAccess');
   const urlAtual = window.location.href.split('?')[0];
 
   if (urlAtual.toLowerCase().endsWith('admin.html')) {
-    window.location.href = urlAtual.replace(/admin\.html$/i, 'index.html');
+    window.location.href = urlAtual.replace(/admin\\.html$/i, 'index.html');
     return;
   }
   
@@ -837,4 +862,5 @@ function painel() {
 </script>
 </body>
 </html>
+
 

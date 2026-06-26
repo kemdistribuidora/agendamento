@@ -420,7 +420,7 @@
       <p>Agendamento de recebimento de mercadorias</p>
     </div>
   </div>
-  <a class="admin-link" href="login.html" onclick="abrirLoginAdmin(event)" title="Area administrativa">
+  <a class="admin-link" href="admin.html" onclick="abrirLoginAdmin(event)" title="Area administrativa">
     <i data-lucide="shield-check" width="18" height="18"></i>
     <span>Area administrativa</span>
   </a>
@@ -600,21 +600,16 @@ const URL_APPS_SCRIPT = "https://script.google.com/macros/s/AKfycbxm-xDgb0Vp3-Uo
 function abrirLoginAdmin(event) {
   event.preventDefault();
 
-  const urlAtual = window.location.href.split('?')[0];
+  const senhaInformada = prompt('Digite a senha de acesso ao painel administrativo:');
+  if (!senhaInformada) return;
 
-  // Se você estiver rodando em ambiente local (Live Server ou arquivo direto)
-  if (urlAtual.startsWith('http://localhost') || urlAtual.startsWith('http://127.0.0.1') || urlAtual.startsWith('file:///')) {
-    // Descobre o caminho da pasta atual para redirecionar para o login.html local
-    if (urlAtual.endsWith('/')) {
-      window.location.href = urlAtual + 'login.html';
-    } else {
-      window.location.href = urlAtual.replace(/[^\/]*$/, 'login.html');
-    }
+  if (senhaInformada.trim().toLowerCase() === 'kem2026') {
+    sessionStorage.setItem('adminAccess', 'true');
+    window.location.href = 'admin.html';
     return;
   }
 
-  // Fallback caso você use o deploy de páginas internas do Apps Script futuramente
-  (window.top || window).location.href = URL_APPS_SCRIPT + '?page=login';
+  alert('Senha incorreta.');
 }
 
 function renderIcons() {
@@ -833,4 +828,5 @@ function agendamento() {
 </script>
 </body>
 </html>
+
 
