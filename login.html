@@ -350,15 +350,20 @@ function login() {
     irParaAdmin() {
       const urlAtual = window.location.href.split('?')[0];
 
-      // Hospedagem estatica (arquivos .html lado a lado)
+      // Se o arquivo atual termina com login.html, joga para admin.html na mesma pasta local
       if (urlAtual.toLowerCase().endsWith('login.html')) {
         window.location.href = urlAtual.replace(/login\.html$/i, 'admin.html');
         return;
       }
 
-      // Deploy no Apps Script: navega a janela de topo (fora do iframe sandbox)
-      // para a URL real /exec com ?page=admin.
-      (window.top || window).location.href = URL_APPS_SCRIPT + '?page=admin';
+      // Se você abrir apenas a pasta, adiciona admin.html ao final do caminho
+      if (urlAtual.endsWith('/')) {
+        window.location.href = urlAtual + 'admin.html';
+        return;
+      }
+
+      // Fallback padrão para servidores locais (Ex: Live Server do VS Code)
+      window.location.href = 'admin.html';
     },
 
     entrar() {
