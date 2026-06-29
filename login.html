@@ -377,8 +377,8 @@ function login() {
       })
         .then(res => {
           this.carregando = false;
-          if (res && res.ok) {
-            sessionStorage.setItem('adminAccess', 'true');
+          if (res && res.ok && res.token) {
+            sessionStorage.setItem('adminToken', res.token);
             this.irParaAdmin();
           } else {
             this.erro = res?.msg || 'Usuário ou senha inválidos.';

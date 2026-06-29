@@ -641,8 +641,9 @@
 const URL_AP_SCRIPT = "https://script.google.com/macros/s/AKfycbzU2GL7D7DIKY51nHP8dyRthSHZWxPe98noAGlvYnw-uor776ewtWnyvRT9UJY8QDDL/exec";
 
 function validarAcessoAdmin() {
-  // O acesso é concedido apenas pelo login.html (que valida no backend).
-  if (sessionStorage.getItem('adminAccess') === 'true') return true;
+  // Precisa de um token de sessão emitido pelo login.html. A validade real
+  // é checada no backend a cada chamada (token inválido -> volta ao login).
+  if (sessionStorage.getItem('adminToken')) return true;
 
   window.location.href = 'login.html';
   return false;
@@ -653,14 +654,27 @@ if (!validarAcessoAdmin()) {
 }
 
 function sairPainel() {
-  sessionStorage.removeItem('adminAccess');
-  const urlAtual = window.location.href.split('?')[0];
+  const token = sessionStorage.getItem('adminToken');
+  sessionStorage.removeItem('adminToken');
 
+  // Encerra a sessão no servidor (best-effort, não bloqueia a saída)
+  if (token) {
+    try {
+      fetch(URL_AP_SCRIPT, {
+        method: 'POST',
+        mode: 'cors',
+        keepalive: true,
+        headers: { 'Content-Type': 'text/plain' },
+        body: JSON.stringify({ action: 'logout', token: token })
+      });
+    } catch (e) {}
+  }
+
+  const urlAtual = window.location.href.split('?')[0];
   if (urlAtual.toLowerCase().endsWith('admin.html')) {
     window.location.href = urlAtual.replace(/admin\\.html$/i, 'index.html');
     return;
   }
-  
   window.location.href = 'index.html';
 }
 
@@ -701,9 +715,21 @@ function painel() {
           method: 'POST',
           mode: 'cors',
           headers: { 'Content-Type': 'text/plain' },
-          body: JSON.stringify({ action: action, data: paramData })
+          body: JSON.stringify({
+            action: action,
+            data: paramData,
+            token: sessionStorage.getItem('adminToken')
+          })
         });
-        return await response.json();
+        const json = await response.json();
+
+        // Sessão inválida/expirada no backend -> volta ao login
+        if (json && json.autorizado === false) {
+          sessionStorage.removeItem('adminToken');
+          window.location.href = 'login.html';
+          throw new Error('Sessão expirada');
+        }
+        return json;
       } catch (error) {
         console.error(`Erro na action ${action}:`, error);
         throw error;
