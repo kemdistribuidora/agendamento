@@ -581,7 +581,7 @@
             <template x-for="row in filtrados" :key="row.id">
               <tr>
                 <td class="td-data" x-text="row.dataFormatada"></td>
-                <td class="td-hora" x-text="row.horario"></td>
+                <td class="td-hora" x-text="row.horario2 ? (row.horario + ' / ' + row.horario2) : row.horario"></td>
                 <td class="td-fornecedor" x-text="row.fornecedor"></td>
                 <td class="td-cnpj" x-text="row.cnpj"></td>
                 <td class="td-email" x-text="row.email"></td>
@@ -610,10 +610,15 @@
                   <div class="acoes">
                     <template x-if="row.aprovacao === 'PENDENTE'">
                       <div class="acoes">
-                        <button class="btn btn-success btn-acao" data-tip="Aprovar" @click="aprovar(row.id)">
-                          <i data-lucide="check" width="16" height="16"></i>
+                        <button class="btn btn-success btn-sm" @click="aprovar(row.id, row.horario)">
+                          <i data-lucide="check" width="15" height="15"></i>
+                          <span x-text="'Aprovar ' + row.horario"></span>
                         </button>
-                        <button class="btn btn-danger btn-acao" data-tip="Reprovar" @click="reprovar(row.id)">
+                        <button class="btn btn-success btn-sm" x-show="row.horario2" @click="aprovar(row.id, row.horario2)">
+                          <i data-lucide="check" width="15" height="15"></i>
+                          <span x-text="'Aprovar ' + row.horario2"></span>
+                        </button>
+                        <button class="btn btn-danger btn-acao" data-tip="Reprovar (descarta os dois)" @click="reprovar(row.id)">
                           <i data-lucide="x" width="16" height="16"></i>
                         </button>
                       </div>
@@ -780,17 +785,21 @@ function painel() {
       renderIcons();
     },
 
-    aprovar(id) {
-      this.chamarAPI('aprovarAgendamento', { id: id })
+    aprovar(id, horario) {
+      this.chamarAPI('aprovarAgendamento', { id: id, horario: horario })
         .then(res => {
           if (res && res.ok === false) {
             this.mostrarToast(res.msg || 'Erro ao aprovar.', 'erro');
             return;
           }
           const idx = this.agendamentos.findIndex(a => a.id === id);
-          if (idx !== -1) this.agendamentos[idx].aprovacao = 'APROVADO';
+          if (idx !== -1) {
+            this.agendamentos[idx].aprovacao = 'APROVADO';
+            if (horario) this.agendamentos[idx].horario = horario; // horário definitivo
+            this.agendamentos[idx].horario2 = '';                  // 2º horário liberado
+          }
           this.aplicarFiltros();
-          this.mostrarToast('Agendamento aprovado. E-mail enviado.', 'sucesso');
+          this.mostrarToast('Agendamento aprovado para ' + (horario || '') + '. E-mail enviado.', 'sucesso');
         })
         .catch(() => {
           this.mostrarToast('Erro ao aprovar.', 'erro');

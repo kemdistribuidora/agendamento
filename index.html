@@ -571,30 +571,57 @@
         <input type="text" id="dataPicker" readonly placeholder="Selecione uma data">
       </div>
 
-      <div class="form-group">
-        <label>Horário disponível *</label>
-        <select x-show="!form.data || carregandoHorarios || horarios.length === 0" disabled>
-          <option x-text="carregandoHorarios ? 'Carregando horários...' : (form.data ? 'Nenhum horário disponível' : 'Selecione a data primeiro')"></option>
-        </select>
+      <div class="grid-2">
+        <div class="form-group">
+          <label>1º horário *</label>
+          <select x-show="!form.data || carregandoHorarios || horarios.length === 0" disabled>
+            <option x-text="carregandoHorarios ? 'Carregando...' : (form.data ? 'Indisponível' : 'Selecione a data')"></option>
+          </select>
 
-        <select x-show="form.data && !carregandoHorarios && horarios.length > 0" x-model="form.horario">
-          <option value="">Selecione um horário</option>
-          <optgroup label="Manhã">
-            <template x-for="h in horariosManha" :key="h">
-              <option :value="h" x-text="h"></option>
-            </template>
-          </optgroup>
-          <optgroup label="Tarde">
-            <template x-for="h in horariosTarde" :key="h">
-              <option :value="h" x-text="h"></option>
-            </template>
-          </optgroup>
-        </select>
+          <select x-show="form.data && !carregandoHorarios && horarios.length > 0" x-model="form.horario">
+            <option value="">Selecione um horário</option>
+            <optgroup label="Manhã">
+              <template x-for="h in horariosManha" :key="h">
+                <option :value="h" x-text="h" :disabled="h === form.horario2"></option>
+              </template>
+            </optgroup>
+            <optgroup label="Tarde">
+              <template x-for="h in horariosTarde" :key="h">
+                <option :value="h" x-text="h" :disabled="h === form.horario2"></option>
+              </template>
+            </optgroup>
+          </select>
+        </div>
 
-        <p class="helper-text" x-show="form.data && !carregandoHorarios && horarios.length === 0">
-          <i data-lucide="info" width="15" height="15"></i> Nenhum horário disponível nesta data. Escolha outra.
-        </p>
+        <div class="form-group">
+          <label>2º horário (alternativa) *</label>
+          <select x-show="!form.data || carregandoHorarios || horarios.length === 0" disabled>
+            <option x-text="carregandoHorarios ? 'Carregando...' : (form.data ? 'Indisponível' : 'Selecione a data')"></option>
+          </select>
+
+          <select x-show="form.data && !carregandoHorarios && horarios.length > 0" x-model="form.horario2">
+            <option value="">Selecione um horário</option>
+            <optgroup label="Manhã">
+              <template x-for="h in horariosManha" :key="h">
+                <option :value="h" x-text="h" :disabled="h === form.horario"></option>
+              </template>
+            </optgroup>
+            <optgroup label="Tarde">
+              <template x-for="h in horariosTarde" :key="h">
+                <option :value="h" x-text="h" :disabled="h === form.horario"></option>
+              </template>
+            </optgroup>
+          </select>
+        </div>
       </div>
+
+      <p class="helper-text" x-show="form.data && !carregandoHorarios && horarios.length > 0">
+        <i data-lucide="info" width="15" height="15"></i> Escolha 2 horários diferentes. O recebimento confirmará um deles.
+      </p>
+
+      <p class="helper-text" x-show="form.data && !carregandoHorarios && horarios.length === 0">
+        <i data-lucide="info" width="15" height="15"></i> Nenhum horário disponível nesta data. Escolha outra.
+      </p>
 
       <div class="btn-row">
         <button class="btn btn-secondary" @click="etapa = 1"><i data-lucide="arrow-left" width="18" height="18"></i> Voltar</button>
@@ -653,7 +680,7 @@
           <dt>Fornecedor</dt><dd x-text="form.fornecedor"></dd>
           <dt>CNPJ</dt><dd x-text="form.cnpj"></dd>
           <dt>Data</dt><dd x-text="dataFormatadaDisplay()"></dd>
-          <dt>Horário</dt><dd x-text="form.horario"></dd>
+          <dt>Horários</dt><dd x-text="form.horario + ' ou ' + form.horario2"></dd>
           <dt>Nota fiscal</dt><dd x-text="form.nota"></dd>
         </dl>
       </div>
@@ -693,6 +720,7 @@ function agendamento() {
       nota: '',
       data: '',
       horario: '',
+      horario2: '',
       xmlFile: null,
       pdfFile: null
     },
@@ -710,6 +738,7 @@ function agendamento() {
           onChange: (selectedDates, dateStr) => {
             this.form.data = dateStr;
             this.form.horario = '';
+            this.form.horario2 = '';
             this.carregarHorarios(dateStr);
           }
         });
@@ -738,7 +767,9 @@ function agendamento() {
       const cnpjNum = this.form.cnpj.replace(/\D/g, '');
       if (cnpjNum.length !== 14) return this.mostrarAlerta('CNPJ inválido. Digite os 14 dígitos.');
       if (!this.form.nota.trim()) return this.mostrarAlerta('Informe o número da Nota Fiscal.');
-      if (!this.form.email.trim()) return this.mostrarAlerta('Informe o e-mail.');
+      const email = this.form.email.trim();
+      if (!email) return this.mostrarAlerta('Informe o e-mail.');
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) return this.mostrarAlerta('E-mail inválido. Ex: nome@empresa.com.br');
       this.alerta.msg = '';
       this.etapa = 2;
       renderIcons();
@@ -746,7 +777,10 @@ function agendamento() {
 
     irParaEtapa3() {
       if (!this.form.data) return this.mostrarAlerta('Selecione uma data.');
-      if (!this.form.horario) return this.mostrarAlerta('Selecione um horário disponível.');
+      if (this.horarios.length < 2) return this.mostrarAlerta('Esta data não tem 2 horários disponíveis. Escolha outra data.');
+      if (!this.form.horario) return this.mostrarAlerta('Selecione o 1º horário.');
+      if (!this.form.horario2) return this.mostrarAlerta('Selecione o 2º horário (alternativa).');
+      if (this.form.horario === this.form.horario2) return this.mostrarAlerta('Os dois horários devem ser diferentes.');
       this.alerta.msg = '';
       this.etapa = 3;
       renderIcons();
@@ -826,6 +860,7 @@ function agendamento() {
           nota: this.form.nota.trim(),
           data: this.form.data,
           horario: this.form.horario,
+          horario2: this.form.horario2,
           xmlNome: this.form.xmlFile.name,
           xmlConteudo: xmlBase64,
           pdfNome: this.form.pdfFile.name,
@@ -864,7 +899,7 @@ function agendamento() {
     reiniciar() {
       this.form = {
         fornecedor: '', cnpj: '', email: '', nota: '',
-        data: '', horario: '', xmlFile: null, pdfFile: null
+        data: '', horario: '', horario2: '', xmlFile: null, pdfFile: null
       };
       this.horarios = [];
       this.horariosManha = [];
