@@ -194,6 +194,42 @@
       border: 1px solid var(--line);
     }
 
+    .mascote-banda {
+      width: min(1180px, 100%);
+      margin: -90px auto 0;
+      padding: 0 16px clamp(20px, 4vw, 44px);
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      gap: 20px;
+    }
+
+    .mascote-banda img {
+      width: clamp(180px, 20vw, 300px);
+      height: auto;
+      display: block;
+      filter: drop-shadow(0 16px 24px rgba(2, 74, 112, .18));
+      animation: mascote-float 4.6s ease-in-out infinite;
+    }
+
+    .mascote-banda img:first-child {
+      margin-left: clamp(40px, 8vw, 120px);
+    }
+
+    .mascote-banda .mascote-direita {
+      margin-right: clamp(40px, 8vw, 120px);
+      margin-bottom: 30px;
+    }
+
+    @keyframes mascote-float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
+
+    @media (max-width: 900px) {
+      .mascote-banda { display: none; }
+    }
+
     .card {
       width: 100%;
       background: rgba(255, 255, 255, .94);
@@ -688,6 +724,11 @@
     </div>
   </section>
 </main>
+
+<div class="mascote-banda">
+  <img src="imagens/pallet.png" alt="Kenzito com palete, mascote da KEM">
+  <img class="mascote-direita" src="imagens/kenzito.png" alt="Kenzito, mascote da KEM">
+</div>
 
 <footer>Portal de Agendamento de Entregas | Area de Recebimento</footer>
 
