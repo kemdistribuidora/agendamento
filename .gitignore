@@ -7,3 +7,5 @@ appscript.json
 # Temporários
 *.log
 .DS_Store
+.clasp.json
+.gitignore
