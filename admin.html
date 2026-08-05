@@ -859,21 +859,25 @@ function painel() {
     async carregar() {
       this.carregando = true;
 
-      this.chamarAPI('obterEstatisticas')
-        .then(s => { this.stats = s || {}; })
-        .catch(err => { console.error('stats error', err); });
+      // Chamadas em sequência (não em paralelo): disparar as duas ao mesmo
+      // tempo sobrecarrega o redirect do Apps Script (googleusercontent.com
+      // /macros/echo) e causa erro de CORS/404 intermitente.
+      try {
+        this.stats = (await this.chamarAPI('obterEstatisticas')) || {};
+      } catch (err) {
+        console.error('stats error', err);
+      }
 
-      this.chamarAPI('listarAgendamentos', {})
-        .then(lista => {
-          this.carregando = false;
-          this.agendamentos = Array.isArray(lista) ? lista : [];
-          this.aplicarFiltros();
-          renderIcons();
-        })
-        .catch(() => {
-          this.carregando = false;
-          this.mostrarToast('Erro ao carregar agendamentos.', 'erro');
-        });
+      try {
+        const lista = await this.chamarAPI('listarAgendamentos', {});
+        this.agendamentos = Array.isArray(lista) ? lista : [];
+        this.aplicarFiltros();
+        renderIcons();
+      } catch (err) {
+        this.mostrarToast('Erro ao carregar agendamentos.', 'erro');
+      } finally {
+        this.carregando = false;
+      }
     },
 
     aplicarFiltros() {
