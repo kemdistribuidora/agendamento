@@ -683,10 +683,10 @@
                   <div class="acoes">
                     <template x-if="row.aprovacao === 'PENDENTE'">
                       <div class="acoes">
-                        <button class="btn btn-success btn-acao" data-tip="Aprovar" @click="abrirAprovacao(row)">
+                        <button class="btn btn-success btn-acao" data-tip="Aprovar" @click="abrirAprovacao(row)" :disabled="processando[row.id]">
                           <i data-lucide="check" width="16" height="16"></i>
                         </button>
-                        <button class="btn btn-danger btn-acao" data-tip="Reprovar" @click="reprovar(row.id)">
+                        <button class="btn btn-danger btn-acao" data-tip="Reprovar" @click="reprovar(row.id)" :disabled="processando[row.id]">
                           <i data-lucide="x" width="16" height="16"></i>
                         </button>
                       </div>
@@ -743,7 +743,7 @@
   </div>
 
 <script>
-const URL_AP_SCRIPT = "https://script.google.com/macros/s/AKfycbyB41vtRIfuPD8kEBFZlUtQkfokgmLpCAu0gVjJYIG__eAbzrd2uFLmxovEfEZjTUeR/exec";
+const URL_AP_SCRIPT = "https://script.google.com/macros/s/AKfycbytn5Fkik-KLap4vhcMp_oLg5n_tFqs0yLk8j_OdjZC9q_FfCZ1nCVzTU5JFzxwffss/exec";
 
 function validarAcessoAdmin() {
   // Precisa de um token de sessão emitido pelo login.html. A validade real
@@ -777,7 +777,7 @@ function sairPainel() {
 
   const urlAtual = window.location.href.split('?')[0];
   if (urlAtual.toLowerCase().endsWith('admin.html')) {
-    window.location.href = urlAtual.replace(/admin\\.html$/i, 'index.html');
+    window.location.href = urlAtual.replace(/admin\.html$/i, 'index.html');
     return;
   }
   window.location.href = 'index.html';
@@ -797,6 +797,7 @@ function painel() {
     agendamentos: [],
     filtrados: [],
     stats: {},
+    processando: {},
 
     filtros: {
       busca: '',
@@ -894,6 +895,8 @@ function painel() {
     },
 
     abrirAprovacao(row) {
+      if (this.processando[row.id]) return;
+
       // Se só houver um horário (registro antigo), aprova direto sem modal.
       if (!row.horario2) {
         this.aprovar(row.id, row.horario);
@@ -920,6 +923,9 @@ function painel() {
     },
 
     aprovar(id, horario) {
+      if (this.processando[id]) return;
+      this.processando[id] = true;
+
       this.chamarAPI('aprovarAgendamento', { id: id, horario: horario })
         .then(res => {
           if (res && res.ok === false) {
@@ -933,14 +939,24 @@ function painel() {
             this.agendamentos[idx].horario2 = '';                  // 2º horário liberado
           }
           this.aplicarFiltros();
-          this.mostrarToast('Agendamento aprovado para ' + (horario || '') + '. E-mail enviado.', 'sucesso');
+          if (res && res.avisoEmail) {
+            this.mostrarToast(res.msg || 'Aprovado, mas o e-mail falhou ao enviar.', 'erro');
+          } else {
+            this.mostrarToast('Agendamento aprovado para ' + (horario || '') + '. E-mail enviado.', 'sucesso');
+          }
         })
         .catch(() => {
           this.mostrarToast('Erro ao aprovar.', 'erro');
+        })
+        .finally(() => {
+          this.processando[id] = false;
         });
     },
 
     reprovar(id) {
+      if (this.processando[id]) return;
+      this.processando[id] = true;
+
       this.chamarAPI('reprovarAgendamento', { id: id })
         .then(res => {
           if (res && res.ok === false) {
@@ -954,10 +970,17 @@ function painel() {
             this.stats.reprovados = (this.stats.reprovados || 0) + 1;
           }
           this.aplicarFiltros();
-          this.mostrarToast('Agendamento reprovado. E-mail enviado.', 'sucesso');
+          if (res && res.avisoEmail) {
+            this.mostrarToast(res.msg || 'Reprovado, mas o e-mail falhou ao enviar.', 'erro');
+          } else {
+            this.mostrarToast('Agendamento reprovado. E-mail enviado.', 'sucesso');
+          }
         })
         .catch(() => {
           this.mostrarToast('Erro ao reprovar.', 'erro');
+        })
+        .finally(() => {
+          this.processando[id] = false;
         });
     },
 
