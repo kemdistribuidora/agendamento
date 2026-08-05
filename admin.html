@@ -823,7 +823,7 @@ function painel() {
       this.carregar();
     },
 
-    async chamarAPI(action, paramData = {}) {
+    async chamarAPI(action, paramData = {}, tentativa = 1) {
       try {
         const response = await fetch(URL_AP_SCRIPT, {
           method: 'POST',
@@ -845,6 +845,12 @@ function painel() {
         }
         return json;
       } catch (error) {
+        // Apps Script às vezes falha na primeira chamada (cold start / CORS
+        // transitório do lado do Google). Repete algumas vezes antes de desistir.
+        if (tentativa < 3) {
+          await new Promise(r => setTimeout(r, 600 * tentativa));
+          return this.chamarAPI(action, paramData, tentativa + 1);
+        }
         console.error(`Erro na action ${action}:`, error);
         throw error;
       }
