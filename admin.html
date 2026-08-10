@@ -681,16 +681,12 @@
 
                 <td>
                   <div class="acoes">
-                    <template x-if="row.aprovacao === 'PENDENTE'">
-                      <div class="acoes">
-                        <button class="btn btn-success btn-acao" data-tip="Aprovar" @click="abrirAprovacao(row)" :disabled="processando[row.id]">
-                          <i data-lucide="check" width="16" height="16"></i>
-                        </button>
-                        <button class="btn btn-danger btn-acao" data-tip="Reprovar" @click="reprovar(row.id)" :disabled="processando[row.id]">
-                          <i data-lucide="x" width="16" height="16"></i>
-                        </button>
-                      </div>
-                    </template>
+                    <button class="btn btn-success btn-acao" data-tip="Aprovar" x-show="row.aprovacao === 'PENDENTE'" @click="abrirAprovacao(row)" :disabled="!!processando[row.id]">
+                      <i data-lucide="check" width="16" height="16"></i>
+                    </button>
+                    <button class="btn btn-danger btn-acao" data-tip="Reprovar" x-show="row.aprovacao === 'PENDENTE'" @click="reprovar(row.id)" :disabled="!!processando[row.id]">
+                      <i data-lucide="x" width="16" height="16"></i>
+                    </button>
 
                     <span style="color:var(--muted);font-size:.82rem;" x-show="row.aprovacao !== 'PENDENTE'">—</span>
                   </div>
