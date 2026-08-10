@@ -733,7 +733,7 @@
 <footer>Portal de Agendamento de Entregas | Area de Recebimento</footer>
 
 <script>
-const URL_APPS_SCRIPT = "https://script.google.com/macros/s/AKfycbxCZp5Rjt7pq0ZvHi03dFsGqKV-cjKP9y5mj--B1W7MMIUo8Wtkvzo6uzC6c4ud3Z2a/exec";
+const URL_APPS_SCRIPT = "https://script.google.com/macros/s/AKfycbwQEjsbw5NtzcqVuJRts3Q63x1ZOXD5aAsCw80W_v9aLLJkQza7N4zdRcQKKNqCDZsA/exec";
 
 function renderIcons() {
   if (window.lucide) setTimeout(() => lucide.createIcons(), 0);
@@ -787,14 +787,24 @@ function agendamento() {
       });
     },
 
-    async chamarAPI(action, paramData = {}) {
-      const response = await fetch(URL_APPS_SCRIPT, {
-        method: 'POST',
-        mode: 'cors',
-        headers: { 'Content-Type': 'text/plain' },
-        body: JSON.stringify({ action: action, data: paramData })
-      });
-      return await response.json();
+    async chamarAPI(action, paramData = {}, tentativa = 1) {
+      try {
+        const response = await fetch(URL_APPS_SCRIPT, {
+          method: 'POST',
+          mode: 'cors',
+          headers: { 'Content-Type': 'text/plain' },
+          body: JSON.stringify({ action: action, data: paramData })
+        });
+        return await response.json();
+      } catch (erro) {
+        // Apps Script às vezes falha na primeira chamada (cold start / CORS
+        // transitório do lado do Google). Repete algumas vezes antes de desistir.
+        if (tentativa < 3) {
+          await new Promise(r => setTimeout(r, 600 * tentativa));
+          return this.chamarAPI(action, paramData, tentativa + 1);
+        }
+        throw erro;
+      }
     },
 
     mostrarAlerta(msg, tipo = 'erro') {
