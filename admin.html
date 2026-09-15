@@ -361,6 +361,44 @@
     .link-xml { color: #9a4d00; background: #fff4e6; border-color: #ffdfb4; }
     .link-pdf { color: #a51d2d; background: #fff0f2; border-color: #ffd0d7; }
 
+    .doc-cell { position: relative; }
+
+    .btn-doc-toggle {
+      min-height: 30px;
+      padding: 0 10px;
+      border-radius: var(--radius);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: .76rem;
+      font-weight: 800;
+      color: var(--brand);
+      background: var(--brand-soft);
+      border: 1px solid #cfe0ee;
+      cursor: pointer;
+    }
+    .btn-doc-toggle:hover { filter: brightness(.97); }
+
+    .doc-drawer {
+      position: absolute;
+      z-index: 20;
+      top: calc(100% + 6px);
+      left: 0;
+      min-width: 190px;
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .doc-group { display: flex; flex-direction: column; gap: 5px; }
+    .doc-group-title { font-size: .7rem; font-weight: 800; text-transform: uppercase; letter-spacing: .03em; color: var(--muted); }
+    .doc-group .link-doc { justify-content: flex-start; }
+
     .badge {
       min-height: 28px;
       padding: 0 10px;
@@ -661,13 +699,33 @@
                 <td class="td-nota" x-text="row.nota || '—'"></td>
 
                 <td>
-                  <div class="doc-list">
-                    <a class="link-doc link-xml" :href="row.urlXml" target="_blank" x-show="row.urlXml">
-                      <i data-lucide="file-code-2" width="15" height="15"></i> XML
-                    </a>
-                    <a class="link-doc link-pdf" :href="row.urlPdf" target="_blank" x-show="row.urlPdf">
-                      <i data-lucide="file-text" width="15" height="15"></i> PDF
-                    </a>
+                  <div class="doc-cell">
+                    <button type="button" class="btn-doc-toggle" @click="docsAbertos = (docsAbertos === row.id ? null : row.id)">
+                      <i data-lucide="paperclip" width="14" height="14"></i>
+                      <span x-text="(row.urlsXml.length + row.urlsPdf.length) + ' arquivo(s)'"></span>
+                      <i data-lucide="chevron-down" width="14" height="14"></i>
+                    </button>
+
+                    <div class="doc-drawer" x-show="docsAbertos === row.id" x-cloak @click.outside="docsAbertos = null">
+                      <div class="doc-group" x-show="row.urlsXml.length">
+                        <span class="doc-group-title">XML</span>
+                        <template x-for="(url, idx) in row.urlsXml" :key="'xml'+idx">
+                          <a class="link-doc link-xml" :href="url" target="_blank">
+                            <i data-lucide="file-code-2" width="15" height="15"></i>
+                            <span x-text="row.urlsXml.length > 1 ? ('XML ' + (idx + 1)) : 'XML'"></span>
+                          </a>
+                        </template>
+                      </div>
+                      <div class="doc-group" x-show="row.urlsPdf.length">
+                        <span class="doc-group-title">Nota / fotos</span>
+                        <template x-for="(url, idx) in row.urlsPdf" :key="'doc'+idx">
+                          <a class="link-doc link-pdf" :href="url" target="_blank">
+                            <i data-lucide="file-text" width="15" height="15"></i>
+                            <span x-text="row.urlsPdf.length > 1 ? ('Anexo ' + (idx + 1)) : 'Anexo'"></span>
+                          </a>
+                        </template>
+                      </div>
+                    </div>
                   </div>
                 </td>
 
@@ -794,6 +852,7 @@ function painel() {
     filtrados: [],
     stats: {},
     processando: {},
+    docsAbertos: null,
 
     filtros: {
       busca: '',

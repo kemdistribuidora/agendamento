@@ -413,6 +413,27 @@
     .upload-area.tem-arquivo { border-color: #7cd2a0; background: var(--success-soft); }
     .upload-area.tem-arquivo .upload-icon, .upload-area.tem-arquivo .label-main { color: var(--success); }
 
+    .arquivo-lista { display: flex; flex-direction: column; gap: 7px; margin-top: 10px; }
+    .arquivo-chip {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      border: 1px solid #d7e2ee;
+      background: var(--success-soft);
+      border-radius: var(--radius);
+      padding: 8px 10px;
+    }
+    .arquivo-chip .arquivo-icon { color: var(--success); flex-shrink: 0; display: flex; }
+    .arquivo-chip .arquivo-info { flex: 1; min-width: 0; }
+    .arquivo-chip .arquivo-nome { color: var(--ink); font-size: .84rem; font-weight: 700; word-break: break-word; }
+    .arquivo-chip .arquivo-tamanho { color: var(--muted); font-size: .76rem; }
+    .arquivo-chip .arquivo-remover {
+      border: 0; background: transparent; color: var(--danger); cursor: pointer;
+      display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+      width: 26px; height: 26px; border-radius: 6px;
+    }
+    .arquivo-chip .arquivo-remover:hover { background: var(--danger-soft); }
+
     .btn-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 8px; }
 
     .btn {
@@ -532,7 +553,7 @@
   <section class="intro" aria-label="Resumo do portal">
     <div class="eyebrow"><i data-lucide="calendar-clock" width="15" height="15"></i> Agendamento online</div>
     <h2>Agende sua entrega.</h2>
-    <p>Preencha os dados da nota e anexe o XML e o DANFE para análise do recebimento.</p>
+    <p>Preencha os dados da nota e anexe o(s) XML e a(s) nota(s)/foto(s) para análise do recebimento.</p>
     <div class="support-list">
       <div class="support-item">
         <span class="mini-icon"><i data-lucide="clock" width="18" height="18"></i></span>
@@ -669,26 +690,50 @@
       <div class="section-title"><i data-lucide="paperclip" width="21" height="21"></i> Documentos da nota</div>
 
       <div class="form-group">
-        <label>XML da nota fiscal *</label>
-        <div class="upload-area" :class="{ 'tem-arquivo': form.xmlFile }">
-          <input type="file" accept=".xml" @change="selecionarArquivo($event, 'xml')">
+        <label>XML da(s) nota(s) fiscal(is) *</label>
+        <div class="upload-area" :class="{ 'tem-arquivo': form.xmlFiles.length }">
+          <input type="file" accept=".xml" multiple @change="selecionarArquivos($event, 'xml')">
           <div>
-            <div class="upload-icon" x-html="form.xmlFile ? '<i data-lucide=&quot;file-check-2&quot; width=&quot;28&quot; height=&quot;28&quot;></i>' : '<i data-lucide=&quot;file-up&quot; width=&quot;28&quot; height=&quot;28&quot;></i>'"></div>
-            <div class="label-main" x-text="form.xmlFile ? form.xmlFile.name : 'Clique para selecionar o XML'"></div>
-            <div class="label-sub" x-text="form.xmlFile ? formatarTamanho(form.xmlFile.size) : 'Maximo 10 MB'"></div>
+            <div class="upload-icon" x-html="form.xmlFiles.length ? '<i data-lucide=&quot;file-check-2&quot; width=&quot;28&quot; height=&quot;28&quot;></i>' : '<i data-lucide=&quot;file-up&quot; width=&quot;28&quot; height=&quot;28&quot;></i>'"></div>
+            <div class="label-main" x-text="form.xmlFiles.length ? (form.xmlFiles.length + ' arquivo(s) XML selecionado(s)') : 'Clique para selecionar o(s) XML'"></div>
+            <div class="label-sub">Pode selecionar varios arquivos, maximo 10 MB cada</div>
           </div>
+        </div>
+        <div class="arquivo-lista" x-show="form.xmlFiles.length">
+          <template x-for="(arq, idx) in form.xmlFiles" :key="'xml'+idx">
+            <div class="arquivo-chip">
+              <span class="arquivo-icon"><i data-lucide="file-code-2" width="18" height="18"></i></span>
+              <div class="arquivo-info">
+                <div class="arquivo-nome" x-text="arq.name"></div>
+                <div class="arquivo-tamanho" x-text="formatarTamanho(arq.size)"></div>
+              </div>
+              <button type="button" class="arquivo-remover" @click="removerArquivo('xml', idx)"><i data-lucide="x" width="16" height="16"></i></button>
+            </div>
+          </template>
         </div>
       </div>
 
       <div class="form-group">
-        <label>PDF da nota fiscal / DANFE *</label>
-        <div class="upload-area" :class="{ 'tem-arquivo': form.pdfFile }">
-          <input type="file" accept=".pdf" @change="selecionarArquivo($event, 'pdf')">
+        <label>Nota fiscal / DANFE / fotos *</label>
+        <div class="upload-area" :class="{ 'tem-arquivo': form.docFiles.length }">
+          <input type="file" accept=".pdf,.jpg,.jpeg,.png,.heic,.webp" multiple @change="selecionarArquivos($event, 'doc')">
           <div>
-            <div class="upload-icon" x-html="form.pdfFile ? '<i data-lucide=&quot;file-check-2&quot; width=&quot;28&quot; height=&quot;28&quot;></i>' : '<i data-lucide=&quot;file-up&quot; width=&quot;28&quot; height=&quot;28&quot;></i>'"></div>
-            <div class="label-main" x-text="form.pdfFile ? form.pdfFile.name : 'Clique para selecionar o PDF'"></div>
-            <div class="label-sub" x-text="form.pdfFile ? formatarTamanho(form.pdfFile.size) : 'Maximo 10 MB'"></div>
+            <div class="upload-icon" x-html="form.docFiles.length ? '<i data-lucide=&quot;file-check-2&quot; width=&quot;28&quot; height=&quot;28&quot;></i>' : '<i data-lucide=&quot;file-up&quot; width=&quot;28&quot; height=&quot;28&quot;></i>'"></div>
+            <div class="label-main" x-text="form.docFiles.length ? (form.docFiles.length + ' arquivo(s) selecionado(s)') : 'Clique para selecionar PDF ou fotos'"></div>
+            <div class="label-sub">PDF, JPG, PNG, HEIC ou WEBP. Pode selecionar varios, maximo 10 MB cada</div>
           </div>
+        </div>
+        <div class="arquivo-lista" x-show="form.docFiles.length">
+          <template x-for="(arq, idx) in form.docFiles" :key="'doc'+idx">
+            <div class="arquivo-chip">
+              <span class="arquivo-icon"><i data-lucide="file-text" width="18" height="18"></i></span>
+              <div class="arquivo-info">
+                <div class="arquivo-nome" x-text="arq.name"></div>
+                <div class="arquivo-tamanho" x-text="formatarTamanho(arq.size)"></div>
+              </div>
+              <button type="button" class="arquivo-remover" @click="removerArquivo('doc', idx)"><i data-lucide="x" width="16" height="16"></i></button>
+            </div>
+          </template>
         </div>
       </div>
 
@@ -762,8 +807,8 @@ function agendamento() {
       data: '',
       horario: '',
       horario2: '',
-      xmlFile: null,
-      pdfFile: null
+      xmlFiles: [],
+      docFiles: []
     },
 
     init() {
@@ -857,17 +902,24 @@ function agendamento() {
         });
     },
 
-    selecionarArquivo(event, tipo) {
-      const file = event.target.files[0];
-      if (!file) return;
-      if (file.size > 10 * 1024 * 1024) {
-        this.mostrarAlerta(`O arquivo ${tipo.toUpperCase()} deve ter no máximo 10 MB.`);
-        event.target.value = '';
-        return;
+    selecionarArquivos(event, tipo) {
+      const lista = this.form[tipo === 'xml' ? 'xmlFiles' : 'docFiles'];
+      const novos = Array.from(event.target.files || []);
+      event.target.value = '';
+
+      for (const file of novos) {
+        if (file.size > 10 * 1024 * 1024) {
+          this.mostrarAlerta(`O arquivo "${file.name}" deve ter no máximo 10 MB.`);
+          continue;
+        }
+        const jaExiste = lista.some(f => f.name === file.name && f.size === file.size);
+        if (!jaExiste) lista.push(file);
       }
-      if (tipo === 'xml') this.form.xmlFile = file;
-      if (tipo === 'pdf') this.form.pdfFile = file;
       renderIcons();
+    },
+
+    removerArquivo(tipo, idx) {
+      this.form[tipo === 'xml' ? 'xmlFiles' : 'docFiles'].splice(idx, 1);
     },
 
     formatarTamanho(bytes) {
@@ -892,16 +944,16 @@ function agendamento() {
     },
 
     async salvar() {
-      if (!this.form.xmlFile) return this.mostrarAlerta('Selecione o arquivo XML.');
-      if (!this.form.pdfFile) return this.mostrarAlerta('Selecione o arquivo PDF.');
+      if (!this.form.xmlFiles.length) return this.mostrarAlerta('Selecione ao menos um arquivo XML.');
+      if (!this.form.docFiles.length) return this.mostrarAlerta('Selecione ao menos um arquivo de nota/foto.');
 
       this.salvando = true;
       this.alerta.msg = '';
 
       try {
-        const [xmlBase64, pdfBase64] = await Promise.all([
-          this.fileToBase64(this.form.xmlFile),
-          this.fileToBase64(this.form.pdfFile)
+        const [arquivosXml, arquivosDocs] = await Promise.all([
+          Promise.all(this.form.xmlFiles.map(async f => ({ nome: f.name, conteudo: await this.fileToBase64(f) }))),
+          Promise.all(this.form.docFiles.map(async f => ({ nome: f.name, conteudo: await this.fileToBase64(f) })))
         ]);
 
         const dadosPayload = {
@@ -912,10 +964,8 @@ function agendamento() {
           data: this.form.data,
           horario: this.form.horario,
           horario2: this.form.horario2,
-          xmlNome: this.form.xmlFile.name,
-          xmlConteudo: xmlBase64,
-          pdfNome: this.form.pdfFile.name,
-          pdfConteudo: pdfBase64
+          arquivosXml: arquivosXml,
+          arquivosDocs: arquivosDocs
         };
 
         this.chamarAPI('salvarAgendamento', dadosPayload)
@@ -950,7 +1000,7 @@ function agendamento() {
     reiniciar() {
       this.form = {
         fornecedor: '', cnpj: '', email: '', nota: '',
-        data: '', horario: '', horario2: '', xmlFile: null, pdfFile: null
+        data: '', horario: '', horario2: '', xmlFiles: [], docFiles: []
       };
       this.horarios = [];
       this.horariosManha = [];
