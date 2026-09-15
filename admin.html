@@ -380,10 +380,8 @@
     .btn-doc-toggle:hover { filter: brightness(.97); }
 
     .doc-drawer {
-      position: absolute;
-      z-index: 20;
-      top: calc(100% + 6px);
-      left: 0;
+      position: fixed;
+      z-index: 200;
       min-width: 190px;
       background: #fff;
       border: 1px solid var(--line);
@@ -700,13 +698,13 @@
 
                 <td>
                   <div class="doc-cell">
-                    <button type="button" class="btn-doc-toggle" @click="docsAbertos = (docsAbertos === row.id ? null : row.id)">
+                    <button type="button" class="btn-doc-toggle" @click="abrirDocs(row.id, $event)">
                       <i data-lucide="paperclip" width="14" height="14"></i>
                       <span x-text="(row.urlsXml.length + row.urlsPdf.length) + ' arquivo(s)'"></span>
                       <i data-lucide="chevron-down" width="14" height="14"></i>
                     </button>
 
-                    <div class="doc-drawer" x-show="docsAbertos === row.id" x-cloak @click.outside="docsAbertos = null">
+                    <div class="doc-drawer" x-show="docsAbertos === row.id" x-cloak :style="`top:${docsPos.top}px; left:${docsPos.left}px;`" @click.outside="docsAbertos = null">
                       <div class="doc-group" x-show="row.urlsXml.length">
                         <span class="doc-group-title">XML</span>
                         <template x-for="(url, idx) in row.urlsXml" :key="'xml'+idx">
@@ -853,6 +851,7 @@ function painel() {
     stats: {},
     processando: {},
     docsAbertos: null,
+    docsPos: { top: 0, left: 0 },
 
     filtros: {
       busca: '',
@@ -876,6 +875,18 @@ function painel() {
     init() {
       renderIcons();
       this.carregar();
+      window.addEventListener('scroll', () => { this.docsAbertos = null; }, true);
+      window.addEventListener('resize', () => { this.docsAbertos = null; });
+    },
+
+    abrirDocs(id, event) {
+      if (this.docsAbertos === id) {
+        this.docsAbertos = null;
+        return;
+      }
+      const rect = event.currentTarget.getBoundingClientRect();
+      this.docsPos = { top: rect.bottom + 6, left: rect.left };
+      this.docsAbertos = id;
     },
 
     async chamarAPI(action, paramData = {}, tentativa = 1) {
