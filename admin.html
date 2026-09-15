@@ -346,8 +346,8 @@
     }
 
     .link-doc {
-      min-height: 30px;
-      padding: 0 10px;
+      min-height: 34px;
+      padding: 0 12px;
       border-radius: var(--radius);
       display: inline-flex;
       align-items: center;
@@ -382,18 +382,46 @@
     .doc-drawer {
       position: fixed;
       z-index: 200;
-      min-width: 190px;
+      min-width: 210px;
       background: #fff;
       border: 1px solid var(--line);
       border-radius: var(--radius);
       box-shadow: var(--shadow);
-      padding: 10px;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
+      padding: 14px;
+    }
+    .doc-drawer-body { display: flex; flex-direction: column; gap: 14px; }
+
+    .doc-drawer-backdrop {
+      position: fixed;
+      z-index: 199;
+      inset: 0;
+      background: transparent;
     }
 
-    .doc-group { display: flex; flex-direction: column; gap: 5px; }
+    .doc-drawer-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .doc-drawer-title { font-size: .78rem; font-weight: 800; color: var(--text); }
+
+    .btn-doc-close {
+      width: 26px;
+      height: 26px;
+      padding: 0;
+      display: inline-grid;
+      place-items: center;
+      border: 0;
+      border-radius: 6px;
+      color: var(--muted);
+      background: transparent;
+      cursor: pointer;
+    }
+    .btn-doc-close:hover { color: var(--danger); background: var(--danger-soft); }
+
+    .doc-group { display: flex; flex-direction: column; gap: 8px; }
     .doc-group-title { font-size: .7rem; font-weight: 800; text-transform: uppercase; letter-spacing: .03em; color: var(--muted); }
     .doc-group .link-doc { justify-content: flex-start; }
 
@@ -562,7 +590,7 @@
     }
   </style>
 </head>
-<body x-data="painel()" x-init="init()">
+<body x-data="painel()" x-init="init()" @keydown.escape.window="docsAbertos = null">
 
   <header>
     <div class="header-left">
@@ -698,32 +726,11 @@
 
                 <td>
                   <div class="doc-cell">
-                    <button type="button" class="btn-doc-toggle" @click="abrirDocs(row.id, $event)">
+                    <button type="button" class="btn-doc-toggle" @click.stop="abrirDocs(row.id, $event)">
                       <i data-lucide="paperclip" width="14" height="14"></i>
                       <span x-text="(row.urlsXml.length + row.urlsPdf.length) + ' arquivo(s)'"></span>
                       <i data-lucide="chevron-down" width="14" height="14"></i>
                     </button>
-
-                    <div class="doc-drawer" x-show="docsAbertos === row.id" x-cloak :style="`top:${docsPos.top}px; left:${docsPos.left}px;`" @click.outside="docsAbertos = null">
-                      <div class="doc-group" x-show="row.urlsXml.length">
-                        <span class="doc-group-title">XML</span>
-                        <template x-for="(url, idx) in row.urlsXml" :key="'xml'+idx">
-                          <a class="link-doc link-xml" :href="url" target="_blank">
-                            <i data-lucide="file-code-2" width="15" height="15"></i>
-                            <span x-text="row.urlsXml.length > 1 ? ('XML ' + (idx + 1)) : 'XML'"></span>
-                          </a>
-                        </template>
-                      </div>
-                      <div class="doc-group" x-show="row.urlsPdf.length">
-                        <span class="doc-group-title">Nota / fotos</span>
-                        <template x-for="(url, idx) in row.urlsPdf" :key="'doc'+idx">
-                          <a class="link-doc link-pdf" :href="url" target="_blank">
-                            <i data-lucide="file-text" width="15" height="15"></i>
-                            <span x-text="row.urlsPdf.length > 1 ? ('Anexo ' + (idx + 1)) : 'Anexo'"></span>
-                          </a>
-                        </template>
-                      </div>
-                    </div>
                   </div>
                 </td>
 
@@ -754,6 +761,39 @@
       </div>
     </section>
   </main>
+
+  <div class="doc-drawer-backdrop" x-show="docsAbertos !== null" x-cloak @click="docsAbertos = null"></div>
+
+  <div class="doc-drawer" x-show="linhaAberta" x-cloak :style="`top:${docsPos.top}px; left:${docsPos.left}px;`" @click.outside="docsAbertos = null">
+    <template x-if="linhaAberta">
+      <div class="doc-drawer-body">
+        <div class="doc-drawer-header">
+          <span class="doc-drawer-title">Documentos</span>
+          <button type="button" class="btn-doc-close" aria-label="Fechar documentos" @click.stop="docsAbertos = null">
+            <i data-lucide="x" width="16" height="16"></i>
+          </button>
+        </div>
+        <div class="doc-group" x-show="linhaAberta.urlsXml.length">
+          <span class="doc-group-title">XML</span>
+          <template x-for="(url, idx) in linhaAberta.urlsXml" :key="'xml'+idx">
+            <a class="link-doc link-xml" :href="url" target="_blank">
+              <i data-lucide="file-code-2" width="15" height="15"></i>
+              <span x-text="linhaAberta.urlsXml.length > 1 ? ('XML ' + (idx + 1)) : 'XML'"></span>
+            </a>
+          </template>
+        </div>
+        <div class="doc-group" x-show="linhaAberta.urlsPdf.length">
+          <span class="doc-group-title">Nota / fotos</span>
+          <template x-for="(url, idx) in linhaAberta.urlsPdf" :key="'doc'+idx">
+            <a class="link-doc link-pdf" :href="url" target="_blank">
+              <i data-lucide="file-text" width="15" height="15"></i>
+              <span x-text="linhaAberta.urlsPdf.length > 1 ? ('Anexo ' + (idx + 1)) : 'Anexo'"></span>
+            </a>
+          </template>
+        </div>
+      </div>
+    </template>
+  </div>
 
   <div class="toast"
        :class="toast.tipo === 'sucesso' ? 'toast-success' : 'toast-error'"
@@ -852,6 +892,9 @@ function painel() {
     processando: {},
     docsAbertos: null,
     docsPos: { top: 0, left: 0 },
+    get linhaAberta() {
+      return this.filtrados.find(r => r.id === this.docsAbertos) || null;
+    },
 
     filtros: {
       busca: '',
