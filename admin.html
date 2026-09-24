@@ -301,12 +301,11 @@
     table {
       width: 100%;
       border-collapse: collapse;
-      font-size: .86rem;
-      min-width: 1200px;
+      font-size: .84rem;
     }
 
     thead th {
-      padding: 12px 14px;
+      padding: 11px 10px;
       color: #526176;
       background: #f8fbfd;
       border-bottom: 1px solid var(--line);
@@ -321,7 +320,7 @@
     }
 
     tbody td {
-      padding: 13px 14px;
+      padding: 11px 10px;
       border-bottom: 1px solid #edf2f7;
       color: var(--ink);
       vertical-align: middle;
@@ -332,10 +331,10 @@
     tbody tr:last-child td { border-bottom: 0; }
     .td-data { font-weight: 800; white-space: nowrap; }
     .td-hora { color: var(--brand); font-weight: 800; white-space: nowrap; }
-    .td-fornecedor { font-weight: 700; }
+    .td-fornecedor { font-weight: 700; white-space: normal !important; min-width: 160px; max-width: 280px; }
     .td-cnpj { color: var(--muted); font-family: ui-monospace, SFMono-Regular, Consolas, monospace; font-size: .82rem; }
     .td-nota { color: var(--ink); font-weight: 700; }
-    .td-email { color: var(--muted); font-size: .82rem; }
+    .td-email { color: var(--muted); font-size: .8rem; max-width: 220px; overflow: hidden; text-overflow: ellipsis; }
     .td-created { color: var(--muted); font-size: .8rem; white-space: nowrap; }
 
     .doc-list, .acoes {
@@ -721,7 +720,7 @@
                 <td class="td-hora" x-text="row.horario2 ? (row.horario + ' / ' + row.horario2) : row.horario"></td>
                 <td class="td-fornecedor" x-text="row.fornecedor"></td>
                 <td class="td-cnpj" x-text="row.cnpj"></td>
-                <td class="td-email" x-text="row.email"></td>
+                <td class="td-email" x-text="row.email" :title="row.email"></td>
                 <td class="td-nota" x-text="row.nota || '—'"></td>
 
                 <td>
@@ -764,7 +763,7 @@
 
   <div class="doc-drawer-backdrop" x-show="docsAbertos !== null" x-cloak @click="docsAbertos = null"></div>
 
-  <div class="doc-drawer" x-show="linhaAberta" x-cloak :style="`top:${docsPos.top}px; left:${docsPos.left}px;`" @click.outside="docsAbertos = null">
+  <div class="doc-drawer" x-ref="drawer" x-show="linhaAberta" x-cloak :style="`top:${docsPos.top}px; left:${docsPos.left}px;`" @click.outside="docsAbertos = null">
     <template x-if="linhaAberta">
       <div class="doc-drawer-body">
         <div class="doc-drawer-header">
@@ -930,6 +929,16 @@ function painel() {
       const rect = event.currentTarget.getBoundingClientRect();
       this.docsPos = { top: rect.bottom + 6, left: rect.left };
       this.docsAbertos = id;
+      // Ajusta para caber na tela: abre para cima se faltar espaço embaixo
+      this.$nextTick(() => {
+        const el = this.$refs.drawer;
+        if (!el) return;
+        const h = el.offsetHeight, w = el.offsetWidth;
+        let top = rect.bottom + 6;
+        if (top + h > window.innerHeight - 8) top = Math.max(8, rect.top - h - 6);
+        const left = Math.max(8, Math.min(rect.left, window.innerWidth - w - 8));
+        this.docsPos = { top, left };
+      });
     },
 
     async chamarAPI(action, paramData = {}, tentativa = 1) {
