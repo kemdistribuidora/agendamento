@@ -185,6 +185,22 @@
       line-height: 1.5;
     }
 
+    .fee-list {
+      list-style: none;
+      margin: 8px 0 0;
+      padding: 0;
+      display: grid;
+      gap: 4px;
+    }
+    .fee-list li {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      border-bottom: 1px dashed var(--line, rgba(0,0,0,.12));
+      padding-bottom: 4px;
+    }
+    .fee-list li:last-child { border-bottom: 0; }
+    .fee-list strong { white-space: nowrap; }
     .support-item .mini-icon {
       width: 34px;
       height: 34px;
@@ -565,7 +581,14 @@
       </div>
       <div class="support-item">
         <span class="mini-icon"><i data-lucide="wallet" width="18" height="18"></i></span>
-        <span><strong>Descarga de mercadoria paletizada: R$ 20,00 cada palete</strong>, pago no local em dinheiro ou Pix.</span>
+        <div>
+          <strong>Taxas de recebimento (por palete)</strong>, pagas no local em dinheiro ou Pix:
+          <ul class="fee-list">
+            <li><span>Descarga paletizada</span><strong>R$ 25,00</strong></li>
+            <li><span>Repaletização para conferência de carga</span><strong>R$ 20,00</strong></li>
+            <li><span>Estrechar palete</span><strong>R$ 10,00</strong></li>
+          </ul>
+        </div>
       </div>
     </div>
   </section>
